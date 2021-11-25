@@ -276,12 +276,22 @@ public class GUI_Main
 	// invokes it automatically (Thread safe)
 	private static synchronized void listen() throws Exception
 	{
-		String data = null;
+		// String variable that will be used for incoming data
+		String dataRead = null;
+		
+		// Log message
 		System.out.println("[LOG] Waiting for connection from client...\n");
+		
+		// Listens for a connection and accepts it. Requires another thread
+		// to be executed on. Thread is created on listen function call.
 		Socket client = server.accept();
+		
+		// Grabs the clients host address to display in console and message box
 		String clientAddress = client.getInetAddress().getHostAddress();
 		System.out.println("[LOG] New connection from " + clientAddress);
+		JOptionPane.showMessageDialog(null, "New connection from " + clientAddress, "New Connection", JOptionPane.INFORMATION_MESSAGE);
 		
+		// Read data from input stream. Will replace with JSON reader
 		BufferedReader in = new BufferedReader(
 				new InputStreamReader(client.getInputStream()));
 	}
