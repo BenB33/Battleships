@@ -112,11 +112,13 @@ public class GUI_Panel extends JPanel
 		infoPanel.setLayout(new GridLayout(2, 2));
 		
 		// Information Panel Buttons
-		JButton button1 = new JButton("Button 1");
-		infoPanel.add(button1);
+		JLabel lblInfo1 = new JLabel("Info Section 1");
+		lblInfo1.setHorizontalAlignment(JLabel.CENTER);
+		infoPanel.add(lblInfo1);
 		
-		JButton button2 = new JButton("Button 2");
-		infoPanel.add(button2);
+		JLabel lblInfo2 = new JLabel("Info Section 2");
+		lblInfo2.setHorizontalAlignment(JLabel.CENTER);
+		infoPanel.add(lblInfo2);
 		
 		JButton button3 = new JButton("Button 3");
 		infoPanel.add(button3);

@@ -29,12 +29,10 @@ import javax.swing.SwingConstants;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.net.DatagramSocket;
 
 public class GUI_Main 
 {
@@ -42,7 +40,7 @@ public class GUI_Main
 	// Global Frame
 	private static JFrame frame = null;
 	
-	private static ServerSocket server;
+	private static ServerSocket server = null;
 	private static Socket socket;
 	private static Scanner scanner;
 	private static int port = 53200;
@@ -73,7 +71,7 @@ public class GUI_Main
 	
 	private static void populateMenuBar(JMenuBar menuBar)
 	{
-		String ipAddress = null;
+		String ipAddress = getIPAddressString();
 		
 		// Create JMenu labelled 'Game'
 		JMenu gameMenu = new JMenu("Game");
@@ -109,7 +107,7 @@ public class GUI_Main
 				// Create and add labels to the panel
 				JLabel lblIPTitle = new JLabel("Your IP Address: \n", SwingConstants.RIGHT);
 				JLabel lblPortTitle = new JLabel("Your Port: \n", SwingConstants.RIGHT);
-				JLabel lblIPAddress = new JLabel();
+				JLabel lblIPAddress = new JLabel(ipAddress);
 				JLabel lblPort = new JLabel(String.valueOf(port));
 				JButton btnHost = new JButton("Host Game");
 				JButton btnCancel = new JButton("Cancel");
@@ -224,7 +222,7 @@ public class GUI_Main
 							// IP and Port are valid. Connect to client
 							try 
 							{
-								socket = new Socket(InetAddress.getLocalHost(), port);
+								socket = new Socket(InetAddress.getByName(txtIpAddress.getText()), port);
 								scanner = new Scanner(System.in);
 								
 								System.out.println("[LOG] Connected to server: " + socket.getInetAddress());
@@ -297,9 +295,15 @@ public class GUI_Main
 	}
 	
 	
-	private InetAddress getAddress()
+	private static String getIPAddressString()
 	{
-		return GUI_Main.server.getInetAddress();
+		String ipAddress = null;
+		try {
+			ipAddress = InetAddress.getLocalHost().getHostAddress().toString();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		return ipAddress;
 	}
 	
 	
