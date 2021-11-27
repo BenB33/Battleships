@@ -9,10 +9,13 @@ import javax.swing.JPanel;
 
 // AWT Libraries
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 
@@ -74,8 +77,34 @@ public class GUI_Panel extends JPanel
 		// Create enemy board
 		JPanel enemyBoard = new JPanel();
 		enemyBoard.setBackground(Color.RED);
+		enemyBoard.setLayout(new GridLayout(10, 10));
+		
 		enemyBoardPanel.add(enemyBoard, BorderLayout.CENTER);
 		
+		/*
+		 * 
+		 * Enemy Board
+		 * 
+		 */
+		
+		JButton enemyBoardButton[] = new JButton[100];
+		
+		// For loop for x coordinate buttons
+		for(int x = 0; x < 10; x++)
+		{
+			for(int y = 0; y < 10; y++)
+			{
+				 enemyBoardButton[x+y] = new JButton("" + x+y);
+				 enemyBoardButton[x+y].setPreferredSize(new Dimension(20, 20));
+				 enemyBoardButton[x+y].setForeground(Color.WHITE);
+				 enemyBoardButton[x+y].setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+				 enemyBoardButton[x+y].setOpaque(false);
+				 enemyBoardButton[x+y].setContentAreaFilled(false);
+				 enemyBoard.add(enemyBoardButton[x+y]);
+				System.out.println("Number: " + x+y + "\n");
+			}
+		}
+
 		
 		
 		// Create panel for the local player
@@ -100,7 +129,32 @@ public class GUI_Panel extends JPanel
 		// Create local player board
 		JPanel playerBoard = new JPanel();
 		playerBoard.setBackground(Color.WHITE);
+		playerBoard.setLayout(new GridLayout(10,10));
 		playerBoardPanel.add(playerBoard, BorderLayout.CENTER);
+		
+		
+		/*
+		 * 
+		 * Local Player Board
+		 * 
+		 */
+		JButton playerBoardButton[] = new JButton[100];
+		
+		// For loop for x coordinate buttons
+		for(int x = 0; x < 10; x++)
+		{
+			for(int y = 0; y < 10; y++)
+			{
+				playerBoardButton[x+y] = new JButton("" + x+y);
+				playerBoardButton[x+y].setPreferredSize(new Dimension(5, 5));
+				playerBoardButton[x+y].setForeground(Color.BLACK);
+				playerBoardButton[x+y].setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+				playerBoardButton[x+y].setOpaque(false);
+				playerBoardButton[x+y].setContentAreaFilled(false);
+				playerBoard.add(playerBoardButton[x+y]);
+				System.out.println("Number: " + x+y + "\n");
+			}
+		}
 		
 		
 		
