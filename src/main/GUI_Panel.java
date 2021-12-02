@@ -1,5 +1,6 @@
 package main;
 
+
 // Swing Libraries
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -9,13 +10,9 @@ import javax.swing.JPanel;
 
 // AWT Libraries
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 
@@ -52,12 +49,10 @@ public class GUI_Panel extends JPanel
 		
 		
 		// Setting up layout of panel
-		this.setBackground(Color.LIGHT_GRAY);
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
 		// Create panel for the enemy play field
 		JPanel enemyPanel = new JPanel();
-		enemyPanel.setBackground(Color.DARK_GRAY);
 		this.add(enemyPanel, BorderLayout.WEST);
 		enemyPanel.setLayout(new BorderLayout());
 		
@@ -68,48 +63,18 @@ public class GUI_Panel extends JPanel
 		enemyPanel.add(enemyBoardLabel, BorderLayout.NORTH);
 		
 		// Create enemy board panel
-		JPanel enemyBoardPanel = new JPanel();
-		enemyBoardPanel.setBackground(Color.WHITE);
-		enemyPanel.add(enemyBoardPanel, BorderLayout.CENTER);
-		enemyBoardPanel.setLayout(new BorderLayout());
-		enemyBoardPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		JPanel enemyBoardPanelPadding = new JPanel();
+		enemyPanel.add(enemyBoardPanelPadding, BorderLayout.CENTER);
+		enemyBoardPanelPadding.setLayout(new BorderLayout());
+		enemyBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create enemy board
-		JPanel enemyBoard = new JPanel();
-		enemyBoard.setBackground(Color.RED);
-		enemyBoard.setLayout(new GridLayout(10, 10));
-		
-		enemyBoardPanel.add(enemyBoard, BorderLayout.CENTER);
-		
-		/*
-		 * 
-		 * Enemy Board
-		 * 
-		 */
-		
-		JButton enemyBoardButton[] = new JButton[100];
-		
-		// For loop for x coordinate buttons
-		for(int x = 0; x < 10; x++)
-		{
-			for(int y = 0; y < 10; y++)
-			{
-				 enemyBoardButton[x+y] = new JButton("" + x+y);
-				 enemyBoardButton[x+y].setPreferredSize(new Dimension(20, 20));
-				 enemyBoardButton[x+y].setForeground(Color.WHITE);
-				 enemyBoardButton[x+y].setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				 enemyBoardButton[x+y].setOpaque(false);
-				 enemyBoardButton[x+y].setContentAreaFilled(false);
-				 enemyBoard.add(enemyBoardButton[x+y]);
-				System.out.println("Number: " + x+y + "\n");
-			}
-		}
-
+		Game_Board enemyBoard = new Game_Board();		
+		enemyBoardPanelPadding.add(enemyBoard, BorderLayout.CENTER);
 		
 		
 		// Create panel for the local player
 		JPanel playerPanel = new JPanel();
-		playerPanel.setBackground(Color.GRAY);
 		this.add(playerPanel, BorderLayout.EAST);
 		playerPanel.setLayout(new BorderLayout());
 		
@@ -120,17 +85,14 @@ public class GUI_Panel extends JPanel
 		playerPanel.add(playerBoardLabel, BorderLayout.NORTH);
 		
 		// Create local player board panel
-		JPanel playerBoardPanel = new JPanel();
-		playerBoardPanel.setBackground(Color.BLUE);
-		playerPanel.add(playerBoardPanel, BorderLayout.CENTER);
-		playerBoardPanel.setLayout(new BorderLayout());
-		playerBoardPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		JPanel playerBoardPanelPadding = new JPanel();
+		playerPanel.add(playerBoardPanelPadding, BorderLayout.CENTER);
+		playerBoardPanelPadding.setLayout(new BorderLayout());
+		playerBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create local player board
-		JPanel playerBoard = new JPanel();
-		playerBoard.setBackground(Color.WHITE);
-		playerBoard.setLayout(new GridLayout(10,10));
-		playerBoardPanel.add(playerBoard, BorderLayout.CENTER);
+		Game_Board playerBoard = new Game_Board();
+		playerBoardPanelPadding.add(playerBoard, BorderLayout.CENTER);
 		
 		
 		/*
@@ -138,29 +100,13 @@ public class GUI_Panel extends JPanel
 		 * Local Player Board
 		 * 
 		 */
-		JButton playerBoardButton[] = new JButton[100];
 		
-		// For loop for x coordinate buttons
-		for(int x = 0; x < 10; x++)
-		{
-			for(int y = 0; y < 10; y++)
-			{
-				playerBoardButton[x+y] = new JButton("" + x+y);
-				playerBoardButton[x+y].setPreferredSize(new Dimension(5, 5));
-				playerBoardButton[x+y].setForeground(Color.BLACK);
-				playerBoardButton[x+y].setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				playerBoardButton[x+y].setOpaque(false);
-				playerBoardButton[x+y].setContentAreaFilled(false);
-				playerBoard.add(playerBoardButton[x+y]);
-				System.out.println("Number: " + x+y + "\n");
-			}
-		}
-		
-		
+		// Create player game board
+
+
 		
 		// Information Panel
 		JPanel infoPanel = new JPanel();
-		infoPanel.setBackground(Color.GREEN);
 		playerPanel.add(infoPanel, BorderLayout.SOUTH);
 		infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		infoPanel.setLayout(new GridLayout(2, 2));
