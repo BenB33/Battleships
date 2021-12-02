@@ -24,20 +24,33 @@ public class Game_Board extends JPanel implements MouseListener, MouseMotionList
 	final static Color boarderColor = new Color(0, 0, 0, 127);
 	final static Color coordinateColor = new Color(0, 0, 0, 150);
 	int waterTileRandom[] = new int[100];
+	int selectedTileX, selectedTileY;
 	
 	// Mouse Coordinates
 	int mouseX, mouseY;
 	
 	static BufferedImage[] waterTile = new BufferedImage[4];
+	static BufferedImage[] shipTile = new BufferedImage[3];
 	static
 	{
 		try
 		{
 			// Add all tile images
+			
+			/*
+			 * Water Tiles
+			 */
 			waterTile[0] = ImageIO.read(new File("res/watertile1.jpg"));
 			waterTile[1] = ImageIO.read(new File("res/watertile2.jpg"));
 			waterTile[2] = ImageIO.read(new File("res/watertile3.jpg"));
 			waterTile[3] = ImageIO.read(new File("res/watertile4.jpg"));
+			
+			/*
+			 * Ship Tiles
+			 */
+			shipTile[0] = ImageIO.read(new File("res/battleshiptop1.jpg"));
+			shipTile[1] = ImageIO.read(new File("res/battleshipmiddle1.jpg"));
+			shipTile[2] = ImageIO.read(new File("res/battleshipbottom1.jpg"));
 		}
 		catch (IOException e){ e.printStackTrace(); }
 		
@@ -84,24 +97,44 @@ public class Game_Board extends JPanel implements MouseListener, MouseMotionList
 		{
 			for(int y = 0; y < 10; y++)
 			{		
-				// 
+				// Calculate the top left
 				int topLeftX = tileSize * x + xOffset;
 				int topLeftY = tileSize * y + yOffset;
 
+				// Draw water image to board
 				g.drawImage(waterTile[waterTileRandom[x+y*10]], topLeftX, topLeftY, tileSize, tileSize, null);
 				
 				// Game Piece boarders
 				g.setColor(boarderColor);
 				g.drawRect(topLeftX, topLeftY, tileSize, tileSize);
-
+				
+				// Draw coordinates in top left corner of each tile
 				g.setColor(coordinateColor);
 				g.drawString(""+ (char)('A'+ x) + (y+1), tileSize * x + 2 + xOffset, tileSize * y + 12 + yOffset);
 				
+				// Draw rectangle on tile that mouse is in
 				if(mouseX >= topLeftX && mouseX < topLeftX + tileSize && mouseY >= topLeftY && mouseY < topLeftY + tileSize)
 				{
 					g.setColor(Color.RED);
 					g.fillRect(topLeftX, topLeftY, tileSize, tileSize);
 				}
+				
+				if((x+y*10) == 14)
+				{
+					g.drawImage(shipTile[0], topLeftX, topLeftY, tileSize, tileSize, null);
+					System.out.println("32 or 33");
+				}
+				if((x+y*10) == 24)
+				{
+					g.drawImage(shipTile[1], topLeftX, topLeftY, tileSize, tileSize, null);
+					System.out.println("32 or 33");
+				}
+				if((x+y*10) == 34)
+				{
+					g.drawImage(shipTile[2], topLeftX, topLeftY, tileSize, tileSize, null);
+					System.out.println("32 or 33");
+				}
+								
 			}
 		}
 	}
@@ -127,6 +160,8 @@ public class Game_Board extends JPanel implements MouseListener, MouseMotionList
 	public void mouseClicked(MouseEvent e) 
 	{
 		// TODO Auto-generated method stub
+		
+		this.repaint();
 	}
 
 	@Override
