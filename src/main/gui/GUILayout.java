@@ -1,4 +1,4 @@
-package main;
+package main.gui;
 
 
 // Swing Libraries
@@ -19,7 +19,7 @@ import java.awt.FontFormatException;
 // Other Libraries
 import java.io.IOException;
 
-public class GUI_Panel extends JPanel
+public class GUILayout extends JPanel
 {
 	private static final long serialVersionUID = -5333146759133271395L;
 	private static final float TITLE_FONT_SIZE = 24.0f;
@@ -28,7 +28,19 @@ public class GUI_Panel extends JPanel
 	private static Font mainFont = null;
 	
 	// GUI_Panel Constructor
-	public GUI_Panel()
+	public GUILayout()
+	{
+		loadFont();
+		createEnemyBoard();
+		JPanel playerPanel = createPlayerBoard();
+		createInfoPanel(playerPanel);
+		
+		// Setting up layout of panel
+		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+	}
+	
+	
+	private void loadFont()
 	{
 		if(mainFont == null)
 		{
@@ -46,11 +58,10 @@ public class GUI_Panel extends JPanel
 				e.printStackTrace();
 			}
 		}
-		
-		
-		// Setting up layout of panel
-		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		
+	}
+	
+	private void createEnemyBoard()
+	{
 		// Create panel for the enemy play field
 		JPanel enemyPanel = new JPanel();
 		this.add(enemyPanel, BorderLayout.WEST);
@@ -69,10 +80,12 @@ public class GUI_Panel extends JPanel
 		enemyBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create enemy board
-		Game_Board enemyBoard = new Game_Board();		
+		BoardPanel enemyBoard = new BoardPanel();		
 		enemyBoardPanelPadding.add(enemyBoard, BorderLayout.CENTER);
-		
-		
+	}
+	
+	private JPanel createPlayerBoard()
+	{
 		// Create panel for the local player
 		JPanel playerPanel = new JPanel();
 		this.add(playerPanel, BorderLayout.EAST);
@@ -91,20 +104,14 @@ public class GUI_Panel extends JPanel
 		playerBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create local player board
-		Game_Board playerBoard = new Game_Board();
+		BoardPanel playerBoard = new BoardPanel();
 		playerBoardPanelPadding.add(playerBoard, BorderLayout.CENTER);
 		
-		
-		/*
-		 * 
-		 * Local Player Board
-		 * 
-		 */
-		
-		// Create player game board
-
-
-		
+		return playerPanel;
+	}
+	
+	private void createInfoPanel(JPanel playerPanel)
+	{
 		// Information Panel
 		JPanel infoPanel = new JPanel();
 		playerPanel.add(infoPanel, BorderLayout.SOUTH);

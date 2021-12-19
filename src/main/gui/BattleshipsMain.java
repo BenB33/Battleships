@@ -1,4 +1,4 @@
-package main;
+package main.gui;
 
 // AWT Libraries
 import java.awt.event.ActionListener;
@@ -25,6 +25,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import main.gameMechanics.Game;
+
 // Other Libraries
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -34,9 +36,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GUI_Main 
+public class BattleshipsMain 
 {
-
 	// Global Frame
 	private static JFrame frame = null;
 	
@@ -44,6 +45,8 @@ public class GUI_Main
 	private static Socket socket;
 	private static Scanner scanner;
 	private static int port = 53200;
+	
+	private static Game game = null;
 	
 	public static void main(String[] args) 
 	{
@@ -57,7 +60,7 @@ public class GUI_Main
 		
 		// Set frame's layout and add GUI_Panel
 		frame.setLayout(new BorderLayout());
-		frame.add(new GUI_Panel(), BorderLayout.CENTER);
+		frame.add(new GUILayout(), BorderLayout.CENTER);
 
 		// Centre the frame to the monitor
 		frame.setLocationRelativeTo(null);
@@ -67,6 +70,9 @@ public class GUI_Main
 		populateMenuBar(menuBar);
 		
 		frame.setVisible(true);
+		
+		// Start game loop on a separate thread
+		game = new Game();
 	}
 	
 	private static void populateMenuBar(JMenuBar menuBar)
@@ -78,16 +84,43 @@ public class GUI_Main
 		gameMenu.setMnemonic('g');
 		menuBar.add(gameMenu);
 		
-		// Create and add items to the menu bar
+		// Single-Player sub-menu
+		JMenuItem singlePlayerItem = new JMenuItem("Single-Player");
+		singlePlayerItem.setMnemonic('s');
+		gameMenu.add(singlePlayerItem);
+		
+		// Multi-Player sub-menu
+		JMenu multiPlayerMenu = new JMenu("Multi-Player");
+		multiPlayerMenu.setMnemonic('m');
+		gameMenu.add(multiPlayerMenu);
+		
+		// Host a multi-player game menu item
 		JMenuItem hostItem = new JMenuItem("Host");
 		hostItem.setMnemonic('h');
-		gameMenu.add(hostItem);
+		multiPlayerMenu.add(hostItem);
+		
+		// Join a multi-player game menu item
 		JMenuItem joinItem = new JMenuItem("Join");
 		hostItem.setMnemonic('j');
-		gameMenu.add(joinItem);
+		multiPlayerMenu.add(joinItem);
+		
+		// Exit game menu item
 		JMenuItem exitItem = new JMenuItem("Exit");
 		exitItem.setMnemonic('e');
 		gameMenu.add(exitItem);
+		
+		
+		
+		// Start a single player game
+		singlePlayerItem.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				
+			}
+		});
+		
 		
 		
 		// Add action listener to host menu
