@@ -29,6 +29,9 @@ public class Game_Board extends JPanel implements MouseListener, MouseMotionList
 	// Mouse Coordinates
 	int mouseX, mouseY;
 	
+	// mouse clicked position
+	int mouseClickedX, mouseClickedY;
+	
 	static BufferedImage[] waterTile = new BufferedImage[4];
 	static BufferedImage[] shipTile = new BufferedImage[3];
 	static
@@ -119,6 +122,11 @@ public class Game_Board extends JPanel implements MouseListener, MouseMotionList
 					g.fillRect(topLeftX, topLeftY, tileSize, tileSize);
 				}
 				
+				// Drop a ship into water
+				placeShips(topLeftX, topLeftY, tileSize, g);
+				
+				
+				// Temp Battleship Print
 				if((x+y*10) == 14)
 				{
 					g.drawImage(shipTile[0], topLeftX, topLeftY, tileSize, tileSize, null);
@@ -160,7 +168,8 @@ public class Game_Board extends JPanel implements MouseListener, MouseMotionList
 	public void mouseClicked(MouseEvent e) 
 	{
 		// TODO Auto-generated method stub
-		
+		mouseClickedX = e.getX();
+		mouseClickedY = e.getY();
 		this.repaint();
 	}
 
@@ -189,6 +198,36 @@ public class Game_Board extends JPanel implements MouseListener, MouseMotionList
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	public void placeShips(int topLeftX, int topLeftY, int tileSize, Graphics2D g)
+	{
+
+			// Drop 3 tile ship into water
+			if(mouseClickedX >= topLeftX && mouseClickedX < topLeftX + tileSize && mouseClickedY >= topLeftY && mouseClickedY < topLeftY + tileSize)
+			{
+				g.drawImage(shipTile[2], topLeftX, topLeftY, tileSize, tileSize, null);
+				g.drawImage(shipTile[1], topLeftX, topLeftY-(tileSize), tileSize, tileSize, null);
+				g.drawImage(shipTile[0], topLeftX, topLeftY-(tileSize*2), tileSize, tileSize, null);
+			}
+			
+			// Drop 2 tile ship into water
+			if(mouseClickedX >= topLeftX && mouseClickedX < topLeftX + tileSize && mouseClickedY >= topLeftY && mouseClickedY < topLeftY + tileSize)
+			{
+				g.drawImage(shipTile[2], topLeftX, topLeftY, tileSize, tileSize, null);
+				g.drawImage(shipTile[0], topLeftX, topLeftY-(tileSize), tileSize, tileSize, null);
+			}
+			
+			// Drop 4 tile ship into water
+			if(mouseClickedX >= topLeftX && mouseClickedX < topLeftX + tileSize && mouseClickedY >= topLeftY && mouseClickedY < topLeftY + tileSize)
+			{
+				g.drawImage(shipTile[2], topLeftX, topLeftY, tileSize, tileSize, null);
+				g.drawImage(shipTile[1], topLeftX, topLeftY-(tileSize), tileSize, tileSize, null);
+				g.drawImage(shipTile[1], topLeftX, topLeftY-(tileSize*2), tileSize, tileSize, null);
+				g.drawImage(shipTile[0], topLeftX, topLeftY-(tileSize*3), tileSize, tileSize, null);
+			}
+
 		
 	}
 }
