@@ -46,6 +46,7 @@ public class Game implements Runnable
 					{
 						//Places enemy ships 
 						placeShipsAtRandom();
+						threadSleep();
 					}
 				}
 
@@ -177,101 +178,206 @@ public class Game implements Runnable
 					// 0 = Horizontal  -  1 = Vertical 
 					int shipOrient = rand.nextInt(2);
 					
+					System.out.println("----------------------------------------------");
+					System.out.println("[Ship Coords X: " + xPos + ", Y: " + yPos + "] [Orient: " + shipOrient + "]\n[Ship Length: " + (i+1) + "]\n\n");
+					
 					// Bound checking
-					if(shipOrient == 0)
+					if(isShipOutOfBounds(i, xPos, yPos, shipOrient, legalTiles))
 					{
-						// Horizontal Checks (Only check X pos)
-						if(xPos + (i+1) >= 10)
-						{
-							// Illegal move detected
-							// Ship leaks out of bounds
-							continue;
-						}
-					}
-					else
-					{
-						// Vertical Checks (Only check Y pos)
-						if(yPos + (i+1) >= 10)
-						{
-							// Illegal move detected
-							// Ship leaks out of bounds
-							continue;
-						}
+						continue;
 					}
 					
-					// Overlap Checking
-					if(shipOrient == 0)
+					// Ship Overlap Checking
+					if(isShipOverlapDetected(i, xPos, yPos, shipOrient, legalTiles))
 					{
-						// Horizontal Ship Overlap Checking
-						for(int k = 0; k < i; k++)
-						{
-							// Looping over each tile in the ship, checking
-							// if there is already a ship in that position
-							// Using i as it gives the length of the current ship
-							if(legalTiles[xPos+i][yPos] == false)
-							{
-								// Illegal move detected
-								// Ship overlaps another ship
-								continue;
-							}
-						}
+						continue;
 					}
-					else
-					{
-						// Vertical Ship Overlap Checking
-						for(int k = 0; k < i; k++)
-						{
-							// Looping over each tile in the ship, checking
-							// if there is already a ship in that position
-							// Using i as it gives the length of the current ship
-							if(legalTiles[xPos][yPos+i] == false)
-							{
-								// Illegal move detected
-								// Ship overlaps another ship
-								continue;
-							}
-						}
-					}
+					
 					
 					// Ship Placement
-					if(shipOrient == 0)
+					
+					if(placeShip(i, xPos, yPos, shipOrient, legalTiles))
 					{
-						// Setting booleans in ship location to false
-						// To let other ships know there is one in this position
-						for(int k = 0; k < i; k++)
-						{
-							legalTiles[xPos+i][yPos] = false;
-						}
+						shipPlaced = true;
 					}
-					else
+					
+					
+					for(int q = 0; q<10;q++)
 					{
-						// Placing a Vertical Ship (Setting booleans to false)
-						// Setting booleans in ship location to false
-						// To let other ships know there is one in this position
-						for(int k = 0; k < i; k++)
+						for(int p = 0; p<10;p++)
 						{
-							legalTiles[xPos][yPos+i] = false;
+							if(legalTiles[p][q] == true)
+							{
+								System.out.print(" . ");
+							}
+							else
+							{
+								System.out.print(" X ");
+							}
 						}
+						System.out.print("\n");
 					}
+					System.out.print("\n\n\n");
 				}
 			}
-		}
-		
-		for(int i = 0; i<10;i++)
+		}	
+	}
+	
+	
+	private boolean isShipOverlapDetected(int shipLength, int xPos, int yPos, int shipOrient, boolean[][] legalTiles)
+	{
+		// Overlap Checking
+		if(shipOrient == 0)
 		{
-			for(int j = 0; j<10;j++)
+			System.out.println("Checking Horizontal Overlapping Ships...\n");
+			
+			
+			boolean illegalMove = false;
+			// Horizontal Ship Overlap Checking
+			for(int k = 0; k <= shipLength; k++)
 			{
-				if(legalTiles[i][j] == true)
+				// Looping over each tile in the ship, checking
+				// if there is already a ship in that position
+				// Using i as it gives the length of the current ship
+				System.out.println("Checking Square: " + (xPos+k) + " " + yPos);
+				if(legalTiles[xPos+k][yPos] == false)
 				{
-					System.out.print(" O ");
-				}
-				else
-				{
-					System.out.print(" X ");
+					// Illegal move detected
+					// Ship overlaps another ship
+					System.out.println("[SHIP OVERLAP DETECTED]\n");
+					illegalMove = true;
+					break;
 				}
 			}
-			System.out.print("\n");
+			if(illegalMove == true)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			System.out.println("Checking Vertical Overlapping Ships...\n");
+			// Vertical Ship Overlap Checking
+			boolean illegalMove = false;
+			for(int k = 0; k <= shipLength; k++)
+			{
+				// Looping over each tile in the ship, checking
+				// if there is already a ship in that position
+				// Using i as it gives the length of the current ship
+				System.out.println("Checking Square: " + xPos + " " + (yPos+k));
+				if(legalTiles[xPos][yPos+k] == false)
+				{
+					// Illegal move detected
+					// Ship overlaps another ship
+					System.out.println("[SHIP OVERLAP DETECTED]\n");
+					illegalMove = true;
+					break;
+				}
+			}
+			if(illegalMove == true)
+			{
+				return true;
+			}
 		}
 		
+		// No Ship Overlap Detected
+		return false;
+	}
+	
+	
+	private boolean isShipOutOfBounds(int shipLength, int xPos, int yPos, int shipOrient, boolean[][] legalTiles)
+	{
+		if(shipOrient == 0)
+		{
+			System.out.println("Checking Bounds...\n");
+			// Horizontal Checks (Only check X pos)
+			if(xPos + (shipLength+1) > 10)
+			{
+				System.out.println("[OUT OF BOUNDS DETECTED]\n");
+				// Illegal move detected
+				// Ship leaks out of bounds
+				return true;
+			}
+		}
+		else
+		{
+			// Vertical Checks (Only check Y pos)
+			if(yPos + (shipLength+1) > 10)
+			{
+				System.out.println("[OUT OF BOUNDS DETECTED]\n");
+				// Illegal move detected
+				// Ship leaks out of bounds
+				return true;
+			}
+		}
+		// No overlap detected
+		return false;
+	}
+
+
+	private boolean placeShip(int shipLegnth, int xPos, int yPos, int shipOrient, boolean[][] legalTiles)
+	{
+		if(shipOrient == 0)
+		{
+			System.out.println("Placing Ships...\n");
+			// Setting booleans in ship location to false
+			// To let other ships know there is one in this position
+			for(int k = 0; k <= shipLegnth; k++)
+			{
+				legalTiles[xPos+k][yPos] = false;
+				
+				if((xPos+k)+1 <= 9)
+				{
+					legalTiles[(xPos+k)+1][yPos] = false;
+				}
+				if((xPos+k)-1 >= 0)
+				{
+					legalTiles[(xPos+k)-1][yPos] = false;
+				}
+				if((yPos)+1 <=9)
+				{
+					legalTiles[xPos+k][yPos+1] = false;
+				}
+				if((yPos)-1 >=0)
+				{
+					legalTiles[xPos+k][yPos-1] = false;
+				}
+			}
+			
+			// Ship placed successfully
+			return true;
+		}
+		else
+		{
+			// Placing a Vertical Ship (Setting booleans to false)
+			// Setting booleans in ship location to false
+			// To let other ships know there is one in this position
+			for(int k = 0; k <= shipLegnth; k++)
+			{
+				legalTiles[xPos][yPos+k] = false;
+				
+				// Marking all orthogonal tiles as invalid
+				// as ships cannot be placed orthogonally
+				if((xPos)+1 <= 9)
+				{
+					legalTiles[xPos+1][yPos+k] = false;
+				}
+				if((xPos)-1 >= 0)
+				{
+					legalTiles[xPos-1][yPos+k] = false;
+				}
+				if((yPos+k)+1 <=9)
+				{
+					legalTiles[xPos][(yPos+k)+1] = false;
+				}
+				if((yPos+k)-1 >=0)
+				{
+					legalTiles[xPos][(yPos+k)-1] = false;
+				}
+			}
+			
+			// Ship placed successfully
+			return true;
+		}
 	}
 }
