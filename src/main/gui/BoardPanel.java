@@ -1,17 +1,28 @@
 package main.gui;
 
-import javax.imageio.ImageIO;
+
+// Project Imports
+import main.gameMechanics.Game;
+
+// Swing Imports
 import javax.swing.JPanel;
+
+// AWT Imports
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
+import java.awt.Point;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+// Other Imports
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+
+
 
 
 import java.util.Random;
@@ -31,14 +42,14 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 	// mouse clicked position
 	int mouseClickedX, mouseClickedY;
 	
-	
+	// Board Identifier
+	String identifier = null;
 	
 	// Water Tile Background
 	int waterTileRandom[] = new int[100];
 	
 	// Buffered Images
-	static BufferedImage[] waterTile = new BufferedImage[4];
-	static BufferedImage[] shipTile = new BufferedImage[3];
+	static BufferedImage[] imageTiles = new BufferedImage[11];
 	static
 	{
 		try
@@ -48,26 +59,31 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 			/*
 			 * Water Tiles
 			 */
-			waterTile[0] = ImageIO.read(new File("res/watertile1.jpg"));
-			waterTile[1] = ImageIO.read(new File("res/watertile2.jpg"));
-			waterTile[2] = ImageIO.read(new File("res/watertile3.jpg"));
-			waterTile[3] = ImageIO.read(new File("res/watertile4.jpg"));
+			imageTiles[0] = ImageIO.read(new File("res/water1.png"));
+			imageTiles[1] = ImageIO.read(new File("res/water2.png"));
+			imageTiles[2] = ImageIO.read(new File("res/water3.png"));
+			imageTiles[3] = ImageIO.read(new File("res/water4.png"));
+			imageTiles[4] = ImageIO.read(new File("res/water5.png"));
 			
 			/*
 			 * Ship Tiles
 			 */
-			shipTile[0] = ImageIO.read(new File("res/battleshiptop1.jpg"));
-			shipTile[1] = ImageIO.read(new File("res/battleshipmiddle1.jpg"));
-			shipTile[2] = ImageIO.read(new File("res/battleshipbottom1.jpg"));
+			imageTiles[5] = ImageIO.read(new File("res/shipMiddleHor.png"));
+			imageTiles[6] = ImageIO.read(new File("res/shipMiddleVer.png"));
+			imageTiles[7] = ImageIO.read(new File("res/shipEndBottom.png"));
+			imageTiles[8] = ImageIO.read(new File("res/shipEndTop.png"));
+			imageTiles[9] = ImageIO.read(new File("res/shipEndLeft.png"));
+			imageTiles[10] = ImageIO.read(new File("res/shipEndRight.png"));
 		}
 		catch (IOException e){ e.printStackTrace(); }
 		
 	}
 
-	public BoardPanel()
+	public BoardPanel(String identify)
 	{
+		identifier = identify;
 		Random rand = new Random();
-		int maxNumber = 4;
+		int maxNumber = 5;
 		for(int i = 0; i < 100; i++)
 		{
 			waterTileRandom[i] = rand.nextInt(maxNumber);
@@ -110,7 +126,7 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 				int topLeftY = tileSize * y + yOffset;
 
 				// Draw water image to board
-				g.drawImage(waterTile[waterTileRandom[x+y*10]], topLeftX, topLeftY, tileSize, tileSize, null);
+				g.drawImage(imageTiles[waterTileRandom[x+y*10]], topLeftX, topLeftY, tileSize, tileSize, null);
 				
 				
 				// Draw rectangle on tile that mouse is in
@@ -156,6 +172,23 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 		// TODO Auto-generated method stub
 		mouseClickedX = e.getX();
 		mouseClickedY = e.getY();
+		
+		
+		if(identifier == "Player")
+		{
+			// Player board has been clicked
+			Game.game.playerBoardClicked(mouseClickedX, mouseClickedY);
+		}
+		else if(identifier == "Enemy")
+		{
+			// Enemy board has been clicked
+			Game.game.enemyBoardClicked(mouseClickedX, mouseClickedY);
+
+		}
+		
+		
+		mousePosToTilePos(e.getX(), e.getY());
+		
 		this.repaint();
 	}
 
@@ -185,5 +218,26 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	
+	private Point mousePosToTilePos(int mouseX, int mouseY)
+	{
+		int tileSize;
+		
+		if (this.getWidth() > this.getHeight()) tileSize = this.getHeight()/10;
+		else tileSize = this.getWidth()/10;
+		
+		int boardSize = tileSize*10;
+		int xOffset = (this.getWidth() - boardSize)/2;
+		int yOffset = (this.getHeight() - boardSize)/2;
+
+		
+		int xPos = (mouseX - xOffset)  / tileSize;
+		int yPos = (mouseY - yOffset) / tileSize;
+		
+		System.out.println(tileSize);
+		
+		return new Point(xPos, yPos);
 	}
 }

@@ -1,14 +1,13 @@
 package main.gui;
 
-
-// Swing Libraries
+// Swing Imports
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-// AWT Libraries
+// AWT Imports
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
@@ -16,8 +15,9 @@ import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.FontFormatException;
 
-// Other Libraries
+// Other Imports
 import java.io.IOException;
+
 
 public class GUILayout extends JPanel
 {
@@ -80,7 +80,7 @@ public class GUILayout extends JPanel
 		enemyBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create enemy board
-		BoardPanel enemyBoard = new BoardPanel();		
+		BoardPanel enemyBoard = new BoardPanel("Enemy");		
 		enemyBoardPanelPadding.add(enemyBoard, BorderLayout.CENTER);
 	}
 	
@@ -104,7 +104,7 @@ public class GUILayout extends JPanel
 		playerBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create local player board
-		BoardPanel playerBoard = new BoardPanel();
+		BoardPanel playerBoard = new BoardPanel("Player");
 		playerBoardPanelPadding.add(playerBoard, BorderLayout.CENTER);
 		
 		return playerPanel;
@@ -127,18 +127,29 @@ public class GUILayout extends JPanel
 		lblInfo2.setHorizontalAlignment(JLabel.CENTER);
 		infoPanel.add(lblInfo2);
 		
-		JButton button3 = new JButton("Button 3");
-		infoPanel.add(button3);
-		
-		JButton exitButton = new JButton("Exit");
-		exitButton.addActionListener(new ActionListener()
+		JButton btnMultiUse = new JButton("Button 3");
+		btnMultiUse.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
+				// Multi use button action:
+				
+				
+			}
+		});
+		infoPanel.add(btnMultiUse);
+		
+		JButton btnExit = new JButton("Exit");
+		btnExit.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				// Exit the program
 				System.exit(0);
 			}
 		});
-		infoPanel.add(exitButton);
+		infoPanel.add(btnExit);
 	}
 }
