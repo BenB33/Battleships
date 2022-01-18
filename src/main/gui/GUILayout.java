@@ -80,7 +80,7 @@ public class GUILayout extends JPanel
 		enemyBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create enemy board
-		BoardPanel enemyBoard = new BoardPanel("Enemy");		
+		BoardPanel enemyBoard = new BoardPanel(BoardOwner.ENEMY);		
 		enemyBoardPanelPadding.add(enemyBoard, BorderLayout.CENTER);
 	}
 	
@@ -104,7 +104,7 @@ public class GUILayout extends JPanel
 		playerBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create local player board
-		BoardPanel playerBoard = new BoardPanel("Player");
+		BoardPanel playerBoard = new BoardPanel(BoardOwner.PLAYER);
 		playerBoardPanelPadding.add(playerBoard, BorderLayout.CENTER);
 		
 		return playerPanel;
