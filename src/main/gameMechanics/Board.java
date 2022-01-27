@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import java.awt.Point;
+
 public class Board {
 
 	public Board() 
@@ -13,13 +15,12 @@ public class Board {
 	
 	// Create an array list of ships
 	List<Ship> ships = new ArrayList<Ship>();
+	List<Point> previousMoves = new ArrayList<Point>();
 	
 	
 	public void placeShipsAtRandom()
 	{
-		// Clears the ship list in case previous game
-		// contains ships
-		ships.clear();
+		resetBoard();
 		
 		
 		// Array contains number of each ship size
@@ -52,7 +53,6 @@ public class Board {
 					// 0 = Horizontal  -  1 = Vertical 
 					ShipOrientation shipOrient = ShipOrientation.values()[rand.nextInt(2)];
 					
-
 					
 					// Bound checking
 					if(isShipOutOfBounds(i, xPos, yPos, shipOrient, legalTiles))
@@ -258,5 +258,94 @@ public class Board {
 			System.out.print("\n");
 		}
 		System.out.print("\n\n\n");
+	}
+	
+	
+	public boolean isMoveLegal(int x, int y)
+	{
+		for(int i = 0; i < previousMoves.size(); i++)
+		{
+			if(x == previousMoves.get(i).x && y == previousMoves.get(i).y)
+			{
+				System.out.println("Prevous move detected.");
+				return false;
+			}
+		}
+		
+		System.out.println("Move is legal.");
+		return true;
+	}
+	
+	public boolean isMoveHit(int x, int y)
+	{
+		for(int i = 0; i < ships.size(); i++)
+		{
+			for(int j = 0; j < ships.get(i).getShipLength(); j++)
+			{
+				if(ships.get(i).getShipOrient() == ShipOrientation.HORIZONTAL)
+				{
+					if(x == ships.get(i).getShipPos().x+j && y == ships.get(i).getShipPos().y)
+					{
+						// Move is hit
+						System.out.println("[x: " + x + "y: " + y + "] Move is a hit!");
+						ships.get(i).setShipHitBoolean(j);
+						if(ships.get(i).isShipSunk())
+						{
+							// Change ship texture to baboons
+							// as ship has been sunk
+						}
+						
+						return true;
+					}
+				}
+				else if(ships.get(i).getShipOrient() == ShipOrientation.VERTICAL)
+				{
+					if(x == ships.get(i).getShipPos().x && y == ships.get(i).getShipPos().y+j)
+					{
+						// Move is hit
+						System.out.println("[x: " + x + "y: " + y + "] Move is a hit!");
+						ships.get(i).setShipHitBoolean(j);
+						if(ships.get(i).isShipSunk())
+						{
+							// Change ship texture to baboons
+							// as ship has been sunk
+						}
+						
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	public boolean playerHasLostTheGame()
+	{
+		for(int i = 0; i < ships.size(); i++)
+		{
+			if(!ships.get(i).isShipSunk())
+			{
+				// If the player has at least one
+				// functioning ship, the game
+				// continues
+				return false;
+			}
+		}
+		
+		// If all of the player ships are sunk
+		// the player has lost the game
+		return true;
+	}
+	
+	
+	private void resetBoard()
+	{
+		// Clears the ship list and previous moves
+		// list in case previous game
+		// contains ships
+		ships.clear();
+		previousMoves.clear();
 	}
 }

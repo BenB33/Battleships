@@ -49,7 +49,7 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 	int waterTileRandom[] = new int[100];
 	
 	// Buffered Images
-	static BufferedImage[] imageTiles = new BufferedImage[12];
+	static BufferedImage[] imageTiles = new BufferedImage[13];
 	static
 	{
 		try
@@ -75,6 +75,12 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 			imageTiles[9] = ImageIO.read(new File("res/shipEndLeft.png"));
 			imageTiles[10] = ImageIO.read(new File("res/shipEndRight.png"));
 			imageTiles[11] = ImageIO.read(new File("res/shipCircle.png"));
+			
+			/*
+			 * Fire Tile
+			 */
+			imageTiles[12] = ImageIO.read(new File("res/hit.png"));
+			
 		}
 		catch (IOException e){ e.printStackTrace(); }
 		
@@ -185,27 +191,7 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 	@Override
 	public void mouseClicked(MouseEvent e) 
 	{
-		// TODO Auto-generated method stub
-		mouseClickedX = e.getX();
-		mouseClickedY = e.getY();
-		
-		
-		if(identifier == BoardOwner.PLAYER)
-		{
-			// Player board has been clicked
-			Game.game.playerBoardClicked(mouseClickedX, mouseClickedY);
-		}
-		else if(identifier == BoardOwner.ENEMY)
-		{
-			// Enemy board has been clicked
-			Game.game.enemyBoardClicked(mouseClickedX, mouseClickedY);
 
-		}
-		
-		
-		mousePosToTilePos(e.getX(), e.getY());
-		
-		this.repaint();
 	}
 
 	@Override
@@ -227,7 +213,28 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
+		Point tilePos = mousePosToTilePos(e.getX(), e.getY());
 		
+		mouseClickedX = tilePos.x;
+		mouseClickedY = tilePos.y;
+		
+		
+		if(identifier == BoardOwner.PLAYER)
+		{
+			// Player board has been clicked
+			Game.game.playerBoardClicked(mouseClickedX, mouseClickedY);
+		}
+		else if(identifier == BoardOwner.ENEMY)
+		{
+			// Enemy board has been clicked
+			Game.game.enemyBoardClicked(mouseClickedX, mouseClickedY);
+
+		}
+		
+		
+		mousePosToTilePos(e.getX(), e.getY());
+		
+		this.repaint();
 	}
 
 	@Override
@@ -323,6 +330,11 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 						g.drawImage(imageTiles[7], topLeftX, topLeftY, tileSize, tileSize, null);
 					}
 				}
+				
+				if(ships.get(i).hasShipTileBeenHit(j))
+				{
+					g.drawImage(imageTiles[12], topLeftX, topLeftY, tileSize, tileSize, null);
+				}
 			}
 		}
 	}
@@ -343,8 +355,14 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 		int xPos = (mouseX - xOffset)  / tileSize;
 		int yPos = (mouseY - yOffset) / tileSize;
 		
-		System.out.println(tileSize);
+		// Bounds checking the mouse click position and returning
+		// null if outside of the playable area
+		if(xPos < 0 || xPos > 10 || yPos < 0 || yPos > 10)
+		{
+			return null;
+		}
 		
+		// If legal click, return the position
 		return new Point(xPos, yPos);
 	}
 }

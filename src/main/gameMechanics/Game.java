@@ -52,6 +52,9 @@ public class Game implements Runnable
 				if(isSinglePlayer)
 				{
 					//Single Player
+					
+					// Create random variations of both the 
+					// player and enemy boards
 					playerBoard.placeShipsAtRandom();
 					enemyBoard.placeShipsAtRandom();
 
@@ -61,12 +64,19 @@ public class Game implements Runnable
 				{
 					// Multi-Player
 					
+					// Create random variation of the
+					// player board
+					//playerBoard.placeShipsAtRandom();
+					
+					// Receive board from enemy
+					
 				}
 
 				break;
 				
 			case MAKING_MOVE:
 				
+				threadSleep();
 				break;
 				
 			case WAITING_FOR_OPPONENT:
@@ -115,34 +125,25 @@ public class Game implements Runnable
 		System.out.println("Thread has been woken up...\n");
 	}
 	
+	public synchronized void finishedShipPlacement()
+	{
+		state = GameState.MAKING_MOVE;
+		System.out.println("Waking up thread...\n");
+		threadWakeUp();
+		System.out.println("Thread has been woken up...\n");
+	}
+	
 	public synchronized void playerBoardClicked(int x, int y)
 	{
 		if (state == GameState.PLACING_SHIP)
 		{
 			// Place ship on that tile
-			
+			System.out.println("x: " + x + " y: " + y);
 		}
 	}
 	
-	public synchronized void enemyBoardClicked(int x, int y)
-	{
-		if (state == GameState.MAKING_MOVE)
-		{
-			// Shoot a bomb
-			
-		}
-	}
 
 	
-	@SuppressWarnings("unused")
-	private void makeMove()
-	{
-		// Click somewhere on board
-		
-		// 
-		
-		// Determine if the move is legal
-	}
 	
 	// Handles hosting a multi-player game
 	public synchronized void hostMultiplayerGame()
@@ -165,4 +166,43 @@ public class Game implements Runnable
 	{
 		return enemyBoard.ships;
 	}
+	
+	
+	// -----------
+	// Making Move
+	// ------------
+	
+	public synchronized void enemyBoardClicked(int x, int y)
+	{
+		if (state == GameState.PLACING_SHIP)
+		{
+			// Shoot a bomb
+			
+			// Check if move is legal
+			if(!enemyBoard.isMoveLegal(x, y))
+			{
+				return;
+			}
+			
+			// Check if move is hit
+			enemyBoard.isMoveHit(x, y);
+			
+			// If legal, thread is awaken and 
+			// state changed to waiting for opponent
+			
+			
+			// Make move then state change
+			
+			
+			
+			// Check if the game is over and the opponent has won
+			if(enemyBoard.playerHasLostTheGame())
+			{
+				// Game is over
+				state = GameState.OPPONENT_HAS_WON;
+			}
+			
+		}
+	}
+
 }

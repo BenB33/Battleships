@@ -7,6 +7,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import main.gameMechanics.Game;
+
 // AWT Imports
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -127,7 +129,7 @@ public class GUILayout extends JPanel
 		lblInfo2.setHorizontalAlignment(JLabel.CENTER);
 		infoPanel.add(lblInfo2);
 		
-		JButton btnMultiUse = new JButton("Button 3");
+		JButton btnMultiUse = new JButton("Next");
 		btnMultiUse.addActionListener(new ActionListener()
 		{
 			@Override

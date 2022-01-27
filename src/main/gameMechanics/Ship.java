@@ -21,8 +21,7 @@ public class Ship {
 	}
 
 
-	@SuppressWarnings("unused")
-	private boolean isShipSunk()
+	public boolean isShipSunk()
 	{
 		// Loop over the shipHitTiles array, searching for
 		// unsunk tiles.
@@ -37,6 +36,16 @@ public class Ship {
 		}
 		// No unsunk tiles detected, ship is sunk
 		return true;
+	}
+	
+	public void setShipHitBoolean(int hitTile)
+	{
+		shipHitTiles[hitTile] = true;
+	}
+	
+	public boolean hasShipTileBeenHit(int hitTile)
+	{
+		return shipHitTiles[hitTile];
 	}
 	
 	public Point getShipPos()
