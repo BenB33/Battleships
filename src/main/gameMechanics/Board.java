@@ -15,7 +15,8 @@ public class Board {
 	
 	// Create an array list of ships
 	List<Ship> ships = new ArrayList<Ship>();
-	List<Point> previousMoves = new ArrayList<Point>();
+	boolean[][] previousMoves = new boolean[10][10];
+	
 	
 	
 	public void placeShipsAtRandom()
@@ -30,7 +31,7 @@ public class Board {
 		// Create random seed
 		Random rand = new Random();
 		
-		// Legal tiles for ships to be, all initially set to true
+		// Initialising and setting all ship legal flags to true
 		boolean[][] legalTiles = new boolean[10][10];
 		for(int i = 0; i<10;i++)
 		{
@@ -40,21 +41,23 @@ public class Board {
 			}
 		}
 
-		
+		// Looping through each ship
 		for(int i = 0; i < shipLengthQty.length; i++)
 		{
+			// Looping through each tile of the current ship
 			for(int j = 0; j < shipLengthQty[i]; j++)
 			{
 				boolean shipPlaced = false;
 				while(!shipPlaced)
 				{
+					// Random x and y coordinates to attempt to place
+					// the ship in a valid location
 					int xPos = rand.nextInt(10);
 					int yPos = rand.nextInt(10);
-					// 0 = Horizontal  -  1 = Vertical 
+					
 					ShipOrientation shipOrient = ShipOrientation.values()[rand.nextInt(2)];
 					
-					
-					// Bound checking
+					// Bound checking the random location of the ship
 					if(isShipOutOfBounds(i, xPos, yPos, shipOrient, legalTiles))
 					{
 						continue;
@@ -66,7 +69,8 @@ public class Board {
 						continue;
 					}
 					
-					// Flag what tiles are legal
+					// Flag what tiles are legal by calculating the tiles
+					// surrounding the current tile
 					flagLegalTiles(i, xPos, yPos, shipOrient, legalTiles);
 
 					// Add new ship with variables that have been checked
@@ -87,7 +91,6 @@ public class Board {
 		if(shipOrient == ShipOrientation.HORIZONTAL)
 		{
 			//System.out.println("Checking Horizontal Overlapping Ships...\n");
-			
 			
 			boolean illegalMove = false;
 			// Horizontal Ship Overlap Checking
@@ -232,7 +235,7 @@ public class Board {
 		}
 	}
 
-	
+	// Getter for the ship list
 	public List<Ship> getShipArray()
 	{
 		return ships;
@@ -263,16 +266,18 @@ public class Board {
 	
 	public boolean isMoveLegal(int x, int y)
 	{
-		for(int i = 0; i < previousMoves.size(); i++)
+		// Looping through the previous moves list of points checking
+		// whether the move being passed to the function is already
+		// in the list. If it is in the list then return false, if
+		// not them return true and add the move to the previous moves list.
+		if(previousMoves[x][y])
 		{
-			if(x == previousMoves.get(i).x && y == previousMoves.get(i).y)
-			{
-				System.out.println("Prevous move detected.");
-				return false;
-			}
+			System.out.println("Prevous move detected.");
+			return false;
 		}
-		
-		System.out.println("Move is legal.");
+
+		//previousMoves.add(new Point(x, y));
+		System.out.println("Move is legal. Added to List");
 		return true;
 	}
 	
@@ -294,7 +299,7 @@ public class Board {
 							// Change ship texture to baboons
 							// as ship has been sunk
 						}
-						
+
 						return true;
 					}
 				}
@@ -346,6 +351,20 @@ public class Board {
 		// list in case previous game
 		// contains ships
 		ships.clear();
-		previousMoves.clear();
+		
+		// Setting all booleans in previousMoves
+		// to false
+		for(int i = 0; i<10; i++)
+		{
+			for(int j = 0; j<10; j++)
+			{
+				previousMoves[i][j] = false;
+			}
+		}
+	}
+	
+	public boolean[][] getPreviousMovesList()
+	{
+		return previousMoves;
 	}
 }

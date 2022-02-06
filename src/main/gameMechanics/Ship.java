@@ -40,7 +40,7 @@ public class Ship {
 	
 	public void setShipHitBoolean(int hitTile)
 	{
-		shipHitTiles[hitTile] = true;
+		shipHitTiles[hitTile] = true; 
 	}
 	
 	public boolean hasShipTileBeenHit(int hitTile)

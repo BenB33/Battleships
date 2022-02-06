@@ -49,7 +49,7 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 	int waterTileRandom[] = new int[100];
 	
 	// Buffered Images
-	static BufferedImage[] imageTiles = new BufferedImage[13];
+	static BufferedImage[] imageTiles = new BufferedImage[14];
 	static
 	{
 		try
@@ -77,9 +77,10 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 			imageTiles[11] = ImageIO.read(new File("res/shipCircle.png"));
 			
 			/*
-			 * Fire Tile
+			 * Misc Tiles
 			 */
 			imageTiles[12] = ImageIO.read(new File("res/hit.png"));
+			imageTiles[13] = ImageIO.read(new File("res/miss.png"));
 			
 		}
 		catch (IOException e){ e.printStackTrace(); }
@@ -157,6 +158,8 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 		else if(identifier == BoardOwner.ENEMY)
 		{
 			drawShips(Game.game.getEnemyShipArray(), g);
+			drawShipHits(Game.game.getEnemyShipArray(), g);
+			drawMiss(g);
 		}
 		
 		
@@ -228,11 +231,7 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 		{
 			// Enemy board has been clicked
 			Game.game.enemyBoardClicked(mouseClickedX, mouseClickedY);
-
 		}
-		
-		
-		mousePosToTilePos(e.getX(), e.getY());
 		
 		this.repaint();
 	}
@@ -244,43 +243,57 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 	}
 	
 	
-	private void drawShips(List<Ship> ships, Graphics2D g)
+	private int getTileSize()
 	{
 		int tileSize;
 		
 		if (this.getWidth() > this.getHeight()) tileSize = this.getHeight()/10;
 		else tileSize = this.getWidth()/10;
 		
+		return tileSize;
+	}
+	
+	private Point getTopLeftPoint(List<Ship> ships, int index, int jindex)
+	{
+		int tileSize = getTileSize();
 		int boardSize = tileSize*10;
-		int xOffset = (this.getWidth() - boardSize)/2;
-		int yOffset = (this.getHeight() - boardSize)/2;
 		
+		int xOffset = (this.getWidth() - boardSize) /2;
+		int yOffset = (this.getHeight() - boardSize) /2;
 		
-		for(int i = 0; i < ships.size(); i++)
+		Point shipCoords = ships.get(index).getShipPos();
+		int xPos = (int) shipCoords.getX();
+		int yPos = (int) shipCoords.getY();
+		
+		int topLeftX = tileSize*xPos + xOffset;
+		int topLeftY = tileSize*yPos + yOffset;
+		
+		// Calculating the position of each tile of the ship
+		if(ships.get(index).getShipOrient() == ShipOrientation.HORIZONTAL)
 		{
-			// Extracts the x and y positions of the ships from the
-			// point into separate ints
-			Point shipCoords = ships.get(i).getShipPos();
-			int xPos = (int) shipCoords.getX();
-			int yPos = (int) shipCoords.getY();
+			topLeftX = topLeftX + (jindex*tileSize);
+		}
+		else if(ships.get(index).getShipOrient() == ShipOrientation.VERTICAL)
+		{
+			topLeftY = topLeftY + (jindex*tileSize);
+		}
+		
+		Point topLeft = new Point(topLeftX, topLeftY);
+		
+		return topLeft;
+	}
+	
+	private void drawShips(List<Ship> ships, Graphics2D g)
+	{
+		int tileSize = getTileSize();
 
-			
+		for(int i = 0; i < ships.size(); i++)
+		{			
 			for(int j = 0; j < ships.get(i).getShipLength(); j++)
 			{
-				// Calculate the top left
-				int topLeftX = tileSize * xPos + xOffset;
-				int topLeftY = tileSize * yPos + yOffset;
-				
-				// Calculating the position of each tile of the ship
-				if(ships.get(i).getShipOrient() == ShipOrientation.HORIZONTAL)
-				{
-					topLeftX = topLeftX + (j*tileSize);
-				}
-				else if(ships.get(i).getShipOrient() == ShipOrientation.VERTICAL)
-				{
-					topLeftY = topLeftY + (j*tileSize);
-				}
-				
+				Point topLeft = getTopLeftPoint(ships, i, j);
+				int topLeftX = (int) topLeft.getX();
+				int topLeftY = (int) topLeft.getY();				
 				
 				// Drawing images to the board
 				if(ships.get(i).getShipLength() == 1)
@@ -330,13 +343,93 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 						g.drawImage(imageTiles[7], topLeftX, topLeftY, tileSize, tileSize, null);
 					}
 				}
-				
+			}
+		}
+	}
+	
+	private void drawShipHits(List<Ship> ships, Graphics2D g)
+	{
+		int tileSize = getTileSize();
+		
+		for(int i = 0; i < ships.size(); i++)
+		{
+			for(int j = 0; j < ships.get(i).getShipLength(); j++)
+			{
+				Point topLeft = getTopLeftPoint(ships, i, j);
+				int topLeftX = (int) topLeft.getX();
+				int topLeftY = (int) topLeft.getY();
+
 				if(ships.get(i).hasShipTileBeenHit(j))
 				{
 					g.drawImage(imageTiles[12], topLeftX, topLeftY, tileSize, tileSize, null);
 				}
 			}
 		}
+	}
+	
+	
+	private void drawMiss(Graphics2D g)
+	{
+		int tileSize = getTileSize();
+		
+		int xOffset = (this.getWidth() - (tileSize*10))/2;
+		int yOffset = (this.getHeight() - (tileSize*10))/2;
+
+		if(identifier == BoardOwner.ENEMY)
+		{
+			for(int x = 0; x < 10; x++)
+			{
+				for(int y = 0; y < 10; y++)
+				{
+					int topLeftX = tileSize*x+xOffset;
+					int topLeftY = tileSize*y+yOffset;
+					
+					if(Game.game.getEnemyBoard().getPreviousMovesList()[x][y] && !doesTileContainShip(x,y))
+					{
+						// Render X
+						g.drawImage(imageTiles[13], topLeftX, topLeftY, tileSize, tileSize, null);
+					}
+				}
+			}
+		}
+		else if(identifier == BoardOwner.PLAYER)
+		{
+			// Draw enemies Miss' when received
+		}
+	}
+	
+	
+	private boolean doesTileContainShip(int xPos, int yPos)
+	{
+		List<Ship> ships = Game.game.getEnemyBoard().getShipArray();
+		for(int i = 0; i < ships.size(); i++)
+		{
+			if(ships.get(i).getShipOrient() == ShipOrientation.HORIZONTAL)
+			{
+				for(int j = 0; j < ships.get(i).getShipLength(); j++)
+				{
+					if(xPos == (int) ships.get(i).getShipPos().getX()+j && yPos == (int)ships.get(i).getShipPos().getY())
+					{
+						// A ship does occupy the tile, so return true.
+						return true;
+					}
+				}
+			}
+			else if(ships.get(i).getShipOrient() == ShipOrientation.VERTICAL)
+			{
+				for(int j = 0; j < ships.get(i).getShipLength(); j++)
+				{
+					if(xPos == (int)ships.get(i).getShipPos().getX() && yPos == (int)ships.get(i).getShipPos().getY()+j)
+					{
+						// A ship does occupy the tile, so return true.
+						return true;
+					}
+				}
+			}
+		}
+		
+		// No ships are found in the tiles, return false.
+		return false;
 	}
 	
 	

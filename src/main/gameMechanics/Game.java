@@ -1,6 +1,7 @@
 package main.gameMechanics;
 
 import java.util.List;
+import java.util.Random;
 
 // State machine that follows flow chart
 public class Game implements Runnable 
@@ -30,6 +31,16 @@ public class Game implements Runnable
 		
 		// Start the thread
 		gameThread.start();
+	}
+	
+	// Ship Array Getters for each board
+	public List<Ship> getPlayerShipArray()
+	{
+		return playerBoard.ships;
+	}
+	public List<Ship> getEnemyShipArray()
+	{
+		return enemyBoard.ships;
 	}
 
 	@Override
@@ -157,15 +168,7 @@ public class Game implements Runnable
 		isSinglePlayer = false;
 	}
 	
-	// Ship Array Getters for each board
-	public List<Ship> getPlayerShipArray()
-	{
-		return playerBoard.ships;
-	}
-	public List<Ship> getEnemyShipArray()
-	{
-		return enemyBoard.ships;
-	}
+
 	
 	
 	// -----------
@@ -181,15 +184,30 @@ public class Game implements Runnable
 			// Check if move is legal
 			if(!enemyBoard.isMoveLegal(x, y))
 			{
+				// Move is not legal, player is required
+				// to click again.
+				
+				// Maybe print error message
 				return;
 			}
 			
+			// Add the current move that has been determined legal
+			// to the previous moves list for the enemy board.
+			enemyBoard.previousMoves[x][y]=true;
+			
 			// Check if move is hit
-			enemyBoard.isMoveHit(x, y);
+			if(enemyBoard.isMoveHit(x, y))
+			{
+				// Move has been detected as a hit
+				
+				// Maybe print out a message or
+				// start animation. Will decide later
+			}
 			
 			// If legal, thread is awaken and 
 			// state changed to waiting for opponent
 			
+
 			
 			// Make move then state change
 			
@@ -205,4 +223,53 @@ public class Game implements Runnable
 		}
 	}
 
+	
+	public synchronized void computerMakeMove()
+	{
+		if(state == GameState.WAITING_FOR_OPPONENT)
+		{
+			// Create random x and y coordinates
+			// to work out the move position
+			Random rand = new Random();		
+			int x = rand.nextInt(10);
+			int y = rand.nextInt(10);
+			
+			// If the move isn't legal, return the function
+			while(!playerBoard.isMoveLegal(x, y))
+			{
+				x = rand.nextInt(10);
+				y = rand.nextInt(10);
+			}
+			
+			// Add NPC move to the previous moves list
+			// after it has been determined legal
+			playerBoard.previousMoves[x][y]=true;
+			
+			// Check if move is a hit
+			if(playerBoard.isMoveHit(x, y))
+			{
+				// Move has been detected as a hit
+				
+				// Maybe print out a message or
+				// start animation. Will decide later
+			}
+
+			
+			
+			if(playerBoard.playerHasLostTheGame())
+			{
+				// Game is over
+				state = GameState.PLAYER_HAS_WON;
+			}	
+		}
+	}
+	
+	public Board getPlayerBoard()
+	{
+		return playerBoard;
+	}
+	public Board getEnemyBoard()
+	{
+		return enemyBoard;
+	}
 }
