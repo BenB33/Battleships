@@ -18,6 +18,7 @@ import java.awt.Point;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.RenderingHints;
 
 // Other Imports
 import java.io.File;
@@ -102,12 +103,10 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 	}
 	
 	// Runs every time panel draws
-	@Override
 	public void paintComponent(Graphics graphics)
 	{
 		// Casting graphics to graphics 2D
 		Graphics2D g = (Graphics2D) graphics;
-		
 
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0,0,this.getWidth(),this.getHeight());
@@ -154,6 +153,8 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 		if(identifier == BoardOwner.PLAYER)
 		{
 			drawShips(Game.game.getPlayerShipArray(), g);
+			drawShipHits(Game.game.getPlayerShipArray(), g);
+			drawMiss(g);
 		}
 		else if(identifier == BoardOwner.ENEMY)
 		{
@@ -172,6 +173,10 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 				g.drawString(""+ (char)('A'+ x) + (y+1), tileSize * x + 2 + xOffset, tileSize * y + 12 + yOffset);
 			}
 		}
+		
+		// Dispose of the graphics object to prevent
+		// memory leak
+		g.dispose();
 	}
 
 	@Override
@@ -394,14 +399,36 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		else if(identifier == BoardOwner.PLAYER)
 		{
-			// Draw enemies Miss' when received
+			for(int x = 0; x < 10; x++)
+			{
+				for(int y = 0; y < 10; y++)
+				{
+					int topLeftX = tileSize*x+xOffset;
+					int topLeftY = tileSize*y+yOffset;
+					
+					if(Game.game.getPlayerBoard().getPreviousMovesList()[x][y] && !doesTileContainShip(x,y))
+					{
+						// Render X
+						g.drawImage(imageTiles[13], topLeftX, topLeftY, tileSize, tileSize, null);
+					}
+				}
+			}
 		}
 	}
 	
 	
 	private boolean doesTileContainShip(int xPos, int yPos)
 	{
-		List<Ship> ships = Game.game.getEnemyBoard().getShipArray();
+		List<Ship> ships = null;
+		if(identifier == BoardOwner.ENEMY)
+		{
+			ships = Game.game.getEnemyBoard().getShipArray();
+		}
+		else if(identifier == BoardOwner.PLAYER)
+		{
+			ships = Game.game.getPlayerBoard().getShipArray();
+		}
+		
 		for(int i = 0; i < ships.size(); i++)
 		{
 			if(ships.get(i).getShipOrient() == ShipOrientation.HORIZONTAL)

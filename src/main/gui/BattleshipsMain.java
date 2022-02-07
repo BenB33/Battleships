@@ -10,7 +10,7 @@ import javax.swing.JMenuBar;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class BattleshipsMain 
+public class BattleshipsMain
 {
 	// Global Frame
 	private static JFrame frame = null;
@@ -47,5 +47,4 @@ public class BattleshipsMain
 		
 		frame.setVisible(true);
 	}
-	
 }

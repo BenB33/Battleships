@@ -58,7 +58,7 @@ public class Game implements Runnable
 				break;
 				
 			case PLACING_SHIP:
-				System.out.println("State: Waiting for play decision...\n");
+				System.out.println("State: Placing Ships...\n");
 				
 				if(isSinglePlayer)
 				{
@@ -69,37 +69,51 @@ public class Game implements Runnable
 					playerBoard.placeShipsAtRandom();
 					enemyBoard.placeShipsAtRandom();
 
-					threadSleep();
+					// Ships have been places for both players
+					// player is ready to make move so state is changed
+					state = GameState.MAKING_MOVE;
 				}
 				else
 				{
 					// Multi-Player
 					
-					// Create random variation of the
-					// player board
-					//playerBoard.placeShipsAtRandom();
-					
-					// Receive board from enemy
-					
+					// The host randomises both the player
+					// and enemy boards and then sends those
+					// boards to the client connected.					
 				}
 
 				break;
 				
 			case MAKING_MOVE:
-				
+				// Local player makes move
+				System.out.println("State: Making move...\n");
+
 				threadSleep();
 				break;
 				
 			case WAITING_FOR_OPPONENT:
-				
+				// CPU/multiplayer opponent makes move
+				System.out.println("State: CPU Move...\n");
+				computerMakeMove();
+				if(playerBoard.playerHasLostTheGame())
+				{
+					state = GameState.OPPONENT_HAS_WON;
+				}
+				else
+				{
+					state = GameState.MAKING_MOVE;
+				}
 				break;
 				
 			case PLAYER_HAS_WON:
-				
+				System.out.println("State: PLAYER HAS WON THE GAME!");
+				state = GameState.WAITING_FOR_PLAY_DECISION;
 				break;
 				
 			case OPPONENT_HAS_WON:
-				
+				System.out.println("State: OPPONENT HAS WON THE GAME!");
+				// TODO: Add modal prompting for game replay
+				state = GameState.WAITING_FOR_PLAY_DECISION;
 				break;
 			}
 		}
@@ -128,7 +142,7 @@ public class Game implements Runnable
 	
 	public synchronized void startSingleplayerGame()
 	{
-		isSinglePlayer = true;			
+		isSinglePlayer = true;
 
 		state = GameState.PLACING_SHIP;
 		System.out.println("Waking up thread...\n");
@@ -177,7 +191,7 @@ public class Game implements Runnable
 	
 	public synchronized void enemyBoardClicked(int x, int y)
 	{
-		if (state == GameState.PLACING_SHIP)
+		if (state == GameState.MAKING_MOVE)
 		{
 			// Shoot a bomb
 			
@@ -196,7 +210,7 @@ public class Game implements Runnable
 			enemyBoard.previousMoves[x][y]=true;
 			
 			// Check if move is hit
-			if(enemyBoard.isMoveHit(x, y))
+			if(enemyBoard.applyMove(x, y))
 			{
 				// Move has been detected as a hit
 				
@@ -211,15 +225,18 @@ public class Game implements Runnable
 			
 			// Make move then state change
 			
-			
-			
+			// TODO: Look at game winning synchonization point
 			// Check if the game is over and the opponent has won
 			if(enemyBoard.playerHasLostTheGame())
 			{
 				// Game is over
-				state = GameState.OPPONENT_HAS_WON;
+				state = GameState.PLAYER_HAS_WON;
 			}
-			
+			else
+			{
+				state = GameState.WAITING_FOR_OPPONENT;				
+			}
+			threadWakeUp();
 		}
 	}
 
@@ -230,26 +247,29 @@ public class Game implements Runnable
 		{
 			// Create random x and y coordinates
 			// to work out the move position
-			Random rand = new Random();		
+			Random rand = new Random();	
+			System.out.println("Rolling random coordinates...");
 			int x = rand.nextInt(10);
 			int y = rand.nextInt(10);
 			
 			// If the move isn't legal, return the function
 			while(!playerBoard.isMoveLegal(x, y))
 			{
+				System.out.println("Move was illegal. Rerolling...");
 				x = rand.nextInt(10);
 				y = rand.nextInt(10);
 			}
 			
+			System.out.println("MOVE: [" + x + ", " + y + "]");
 			// Add NPC move to the previous moves list
 			// after it has been determined legal
 			playerBoard.previousMoves[x][y]=true;
 			
 			// Check if move is a hit
-			if(playerBoard.isMoveHit(x, y))
+			if(playerBoard.applyMove(x, y))
 			{
 				// Move has been detected as a hit
-				
+				System.out.println("Move was a hit!");
 				// Maybe print out a message or
 				// start animation. Will decide later
 			}

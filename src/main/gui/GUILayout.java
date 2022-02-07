@@ -7,8 +7,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import main.gameMechanics.Game;
-
 // AWT Imports
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -16,6 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.FontFormatException;
+
 
 // Other Imports
 import java.io.IOException;
@@ -28,6 +27,9 @@ public class GUILayout extends JPanel
 	
 	// Set main font
 	private static Font mainFont = null;
+	
+	BoardPanel playerBoard;
+	BoardPanel enemyBoard;
 	
 	// GUI_Panel Constructor
 	public GUILayout()
@@ -82,7 +84,7 @@ public class GUILayout extends JPanel
 		enemyBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create enemy board
-		BoardPanel enemyBoard = new BoardPanel(BoardOwner.ENEMY);		
+		enemyBoard = new BoardPanel(BoardOwner.ENEMY);		
 		enemyBoardPanelPadding.add(enemyBoard, BorderLayout.CENTER);
 	}
 	
@@ -106,7 +108,7 @@ public class GUILayout extends JPanel
 		playerBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
 		// Create local player board
-		BoardPanel playerBoard = new BoardPanel(BoardOwner.PLAYER);
+		playerBoard = new BoardPanel(BoardOwner.PLAYER);
 		playerBoardPanelPadding.add(playerBoard, BorderLayout.CENTER);
 		
 		return playerPanel;

@@ -23,7 +23,6 @@ public class Board {
 	{
 		resetBoard();
 		
-		
 		// Array contains number of each ship size
 		// [2 x 1] [2 x 2] [1 x 3] [1 x 4] [1 x 5]
 		int[] shipLengthQty = {2, 2, 1, 1, 1};
@@ -281,7 +280,8 @@ public class Board {
 		return true;
 	}
 	
-	public boolean isMoveHit(int x, int y)
+	// This function makes the move and detects if that move is a hit
+	public boolean applyMove(int x, int y)
 	{
 		for(int i = 0; i < ships.size(); i++)
 		{
@@ -296,8 +296,7 @@ public class Board {
 						ships.get(i).setShipHitBoolean(j);
 						if(ships.get(i).isShipSunk())
 						{
-							// Change ship texture to baboons
-							// as ship has been sunk
+							// TODO: Change sunken ship texture
 						}
 
 						return true;
@@ -312,8 +311,7 @@ public class Board {
 						ships.get(i).setShipHitBoolean(j);
 						if(ships.get(i).isShipSunk())
 						{
-							// Change ship texture to baboons
-							// as ship has been sunk
+							// TODO: Change sunken ship texture
 						}
 						
 						return true;

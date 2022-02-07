@@ -72,6 +72,8 @@ public class MenuBar {
 			{
 				// Single player game has been selected by the user
 				Game.game.startSingleplayerGame();
+				
+				
 			}
 		});
 		
