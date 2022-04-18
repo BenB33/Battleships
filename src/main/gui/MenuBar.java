@@ -9,10 +9,12 @@ import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 // Swing Imports
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,7 +32,7 @@ public class MenuBar {
 	
 	public static void populateMenuBar(JMenuBar menuBar, JFrame frame)
 	{
-		String ipAddress = NetworkUtils.getIPAddressString();
+		ArrayList<String> ipAddressList = NetworkUtils.getIPv4List();
 		
 		// Create Single-Player JMenu
 		JMenu singlePlayerMenu = new JMenu("Single-Player");
@@ -106,9 +108,9 @@ public class MenuBar {
 				// Create and add labels to the panel
 				JLabel lblIPTitle = new JLabel("Your IP Address: \n", SwingConstants.RIGHT);
 				JLabel lblPortTitle = new JLabel("Your Port: \n", SwingConstants.RIGHT);
-				JLabel lblIPAddress = new JLabel(ipAddress);
+				JComboBox comboIPAddress = new JComboBox();
 				JTextField lblPort = new JTextField(String.valueOf(port));
-				JButton btnHost = new JButton("Host Game");
+				JButton btnHost = new JButton("Host Local Game");
 				JButton btnCancel = new JButton("Cancel");
 				
 				// Add action listener to the cancel button
@@ -136,8 +138,13 @@ public class MenuBar {
 				// Add labels to the dialog panel
 				lblIPTitle.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 				hostModalPanel.add(lblIPTitle);
-				lblIPAddress.setText(ipAddress);
-				hostModalPanel.add(lblIPAddress);
+				
+				for(var address : ipAddressList)
+				{
+					comboIPAddress.addItem(address);
+				}
+				
+				hostModalPanel.add(comboIPAddress);
 				hostModalPanel.add(lblPortTitle);
 				hostModalPanel.add(lblPort);
 				hostModalPanel.add(btnHost);

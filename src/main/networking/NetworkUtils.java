@@ -4,26 +4,56 @@ package main.networking;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 // Regex Imports
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.net.Inet4Address;
 // Other Imports
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class NetworkUtils {
 	
 	// Gets the IP address in string form
-	public static String getIPAddressString()
+	public static ArrayList<String> getIPv4List()
 	{
-		String ipAddress = null;
-		try {
-			ipAddress = InetAddress.getLocalHost().getHostAddress().toString();
-		} catch (UnknownHostException e) {
+		ArrayList<String> ipAddressList = new ArrayList<>();
+		
+		try 
+		{
+			// Grabbing all of the network interfaces associated with the machine
+			var networkInterfaces = NetworkInterface.getNetworkInterfaces();
+			
+			// Looping through each interface
+			for(var interfaces : Collections.list(networkInterfaces))
+			{
+				// Extracts all of the InetAddresses from the interfaces
+				var inetAddresses = interfaces.getInetAddresses();
+				
+				// Looping through each InetAddress
+				for(var address : Collections.list(inetAddresses))
+				{
+					// If the InetAddress is a loopback address, ignore and continue
+					if(address.isLoopbackAddress()) continue;
+					
+					// If the InetAddress is an ipv4, add it to the IP Address list (trim the / from the start)
+					if(address instanceof Inet4Address)
+					{
+						ipAddressList.add(address.toString().replaceAll("/", ""));
+					}
+				}
+			}
+		} 
+		catch (SocketException e) 
+		{
 			e.printStackTrace();
 		}
-		return ipAddress;
+		return ipAddressList;
 	}
 	
 	// Validates the IP Address using a RegEx pattern
