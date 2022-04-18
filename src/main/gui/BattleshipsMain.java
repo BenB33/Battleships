@@ -46,5 +46,44 @@ public class BattleshipsMain
 		MenuBar.populateMenuBar(menuBar, frame);		
 		
 		frame.setVisible(true);
+		
+		
+		// Main game loop that repaints the screen
+		// 30 times per second to ensure the GUI
+		// is as up-to-date as the game.
+		//
+		// Measure how much time has passed since
+		// the last frame was repainted. If that time
+		// is less than FRAME_TIME, the thread will
+		// sleep until enough time has passed.
+		long lastTime = System.currentTimeMillis();
+		final long FRAME_TIME = 1000 / 30;
+		
+		while(frame.isVisible())
+		{
+			// Repaint the whole frame
+			frame.repaint();
+			
+			long currentTime = System.currentTimeMillis();
+			long deltaTime = currentTime - lastTime;
+			
+			lastTime = currentTime;
+			
+			// If deltaTime is less than the time set for
+			// a frame, the thread will sleep.
+			try
+			{
+				if(deltaTime < FRAME_TIME)
+				{
+					Thread.sleep(FRAME_TIME - deltaTime);
+				}
+			}
+			catch(InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		
 	}
 }

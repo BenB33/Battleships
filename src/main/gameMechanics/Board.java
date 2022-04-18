@@ -270,6 +270,12 @@ public class Board {
 		// whether the move being passed to the function is already
 		// in the list. If it is in the list then return false, if
 		// not then return true.
+		if(x > 9 || x < 0 || y > 9 || y < 0)
+		{
+			System.out.println("Move is off the board.");
+			return false;
+		}
+		
 		if(previousMoves[x][y])
 		{
 			System.out.println("Prevous move detected.");
