@@ -49,7 +49,7 @@ public class NetworkUtils {
 			JOptionPane.showMessageDialog(joinDialog, "ERROR: Please enter a valid Port.");
 			return false;
 		}
-		else if(Integer.valueOf(port) < 0 || Integer.valueOf(port) > 65535)
+		else if(Integer.valueOf(port) < 1024 || Integer.valueOf(port) > 65535)
 		{
 			JOptionPane.showMessageDialog(joinDialog, "ERROR: Please enter a valid Port.");
 			return false;

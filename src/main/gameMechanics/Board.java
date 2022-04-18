@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import java.awt.Point;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Board {
 
@@ -265,10 +266,10 @@ public class Board {
 	
 	public boolean isMoveLegal(int x, int y)
 	{
-		// Looping through the previous moves list of points checking
+		// Looping through the previous moves array, checking
 		// whether the move being passed to the function is already
 		// in the list. If it is in the list then return false, if
-		// not them return true and add the move to the previous moves list.
+		// not then return true.
 		if(previousMoves[x][y])
 		{
 			System.out.println("Prevous move detected.");
@@ -299,6 +300,7 @@ public class Board {
 							// TODO: Change sunken ship texture
 						}
 
+						// Return true as the move was a hit
 						return true;
 					}
 				}
@@ -314,15 +316,15 @@ public class Board {
 							// TODO: Change sunken ship texture
 						}
 						
+						// Return true as the move was a hit
 						return true;
 					}
 				}
 			}
 		}
-		
+		// Return false as the move was a miss
 		return false;
 	}
-	
 	
 	public boolean playerHasLostTheGame()
 	{
@@ -342,8 +344,7 @@ public class Board {
 		return true;
 	}
 	
-	
-	private void resetBoard()
+	public void resetBoard()
 	{
 		// Clears the ship list and previous moves
 		// list in case previous game
@@ -365,4 +366,46 @@ public class Board {
 	{
 		return previousMoves;
 	}
+	
+	
+	// Deserializes json passed to the function and
+	// sets member variables to received data
+	//
+	// The json data passed to this function must be that
+	// of the board, not the whole game.
+    public void deserializeBoard(String json)
+    {
+        // Create a JSON Object using the string passed to function
+        JSONObject jsonObject = new JSONObject(json);
+
+        // Extract the previous moves from the board json
+        var previousMovesString = jsonObject.get("previousMoves");
+
+        // Create a JSON array using the previous moves json
+        JSONArray jsonArray = new JSONArray(previousMovesString.toString());
+
+        // For loop loops through the json array, grabbing each
+        // individual boolean from the json array and storing it
+        // in the previousMoves boolean array.
+        for(int i = 0; i < jsonArray.length(); i++)
+        {
+            jsonArray.get(i);
+
+            JSONArray innerJsonArray = new JSONArray(jsonArray.get(i).toString());
+            for(int j = 0; j < innerJsonArray.length(); j++)
+            {
+                innerJsonArray.getBoolean(j);
+
+                previousMoves[i][j] = innerJsonArray.getBoolean(j);
+            }
+        }
+
+
+        JSONObject shipMap = new JSONObject(jsonObject.get("ships").toString());
+
+        for(int i = 0; i < shipMap.length(); i++)
+        {
+        	ships.get(i).deserializeShip(shipMap.get("Ship " + (i)).toString());
+        }
+    }
 }

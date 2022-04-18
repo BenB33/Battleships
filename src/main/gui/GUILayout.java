@@ -36,6 +36,9 @@ public class GUILayout extends JPanel
 	{
 		loadFont();
 		createEnemyBoard();
+		
+		// Seperate player panel needs to be
+		// initialised for use by the infopanel
 		JPanel playerPanel = createPlayerBoard();
 		createInfoPanel(playerPanel);
 		
@@ -66,24 +69,26 @@ public class GUILayout extends JPanel
 	
 	private void createEnemyBoard()
 	{
-		// Create panel for the enemy play field
+		// Create JPanel to house the enemy board, label and 
+		// padding JPanel
 		JPanel enemyPanel = new JPanel();
 		this.add(enemyPanel, BorderLayout.WEST);
 		enemyPanel.setLayout(new BorderLayout());
 		
-		// Create enemy play field label
+		// Create JLabel to indicate the enemy board
 		JLabel enemyBoardLabel = new JLabel("Enemy Playfield");
 		enemyBoardLabel.setHorizontalAlignment(JLabel.CENTER);
 		enemyBoardLabel.setFont(mainFont.deriveFont(TITLE_FONT_SIZE));
 		enemyPanel.add(enemyBoardLabel, BorderLayout.NORTH);
 		
-		// Create enemy board panel
+		// Create JPanel for padding
 		JPanel enemyBoardPanelPadding = new JPanel();
 		enemyPanel.add(enemyBoardPanelPadding, BorderLayout.CENTER);
 		enemyBoardPanelPadding.setLayout(new BorderLayout());
 		enemyBoardPanelPadding.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		
-		// Create enemy board
+		// Create JPanel from previously initialised BoardPanel (extends JPanel)
+		// with the board owner Enemy
 		enemyBoard = new BoardPanel(BoardOwner.ENEMY);		
 		enemyBoardPanelPadding.add(enemyBoard, BorderLayout.CENTER);
 	}
