@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.StandardSocketOptions;
 
 import org.json.JSONObject;
 
@@ -29,6 +30,8 @@ public class Server
 		try
 		{
 			serverSocket = new ServerSocket(Integer.parseInt(port));
+			//serverSocket.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+			//serverSocket.setOption(StandardSocketOptions.SO_REUSEPORT, true);
 			socket = serverSocket.accept();
 			
 			DataInputStream inputStream = new DataInputStream(socket.getInputStream());
