@@ -5,6 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.json.JSONObject;
+
+import main.gameMechanics.Board;
+
 public class Client 
 {
 	private Socket socket = null;
@@ -47,6 +51,27 @@ public class Client
 		}
 		
 		return jsonGameState;
+	}
+	
+	
+	public void sendToHost(Board[] boards)
+	{
+		JSONObject jsonGameState = new JSONObject();
+		
+		jsonGameState.put("Host Board", boards[0].toString());
+		jsonGameState.put("Client Board", boards[1].toString());
+		
+		try
+		{
+			DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+			outputStream.writeUTF(jsonGameState.toString());
+			outputStream.flush();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
 	}
 	
 	

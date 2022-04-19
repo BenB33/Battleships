@@ -107,8 +107,37 @@ public class Game implements Runnable
 				
 			case WAITING_FOR_OPPONENT:
 				// CPU/multiplayer opponent makes move
-				System.out.println("[State] CPU Move...\n");
-				computerMakeMove();
+				System.out.println("[State] Opponent Move...\n");
+				
+				if(isSinglePlayer)
+				{
+					computerMakeMove();
+				}
+				else
+				{
+					// Multiplayer
+					System.out.println("[LOG] Receiving gamestate from opponent");
+					
+					String stringGameState = "";
+					
+					if(playerRole == NetworkRole.HOST)
+					{
+						stringGameState = server.receieveFromClient();
+					}
+					else
+					{
+						stringGameState = client.receiveFromHost();
+					}
+					
+					JSONObject jsonGameState = new JSONObject(stringGameState);
+					var hostBoardJson = jsonGameState.get("Host Board");
+					enemyBoard.deserializeBoard(hostBoardJson.toString());
+					
+					var clientBoardJson = jsonGameState.get("Client Board");
+					playerBoard.deserializeBoard(clientBoardJson.toString());
+				}
+
+				
 				if(playerBoard.playerHasLostTheGame())
 				{
 					state = GameState.OPPONENT_HAS_WON;
@@ -209,6 +238,8 @@ public class Game implements Runnable
 		// Send both boards to the client
 		Board[] boards = { playerBoard, enemyBoard };
 		server.sendToClient(boards);
+		
+		state = GameState.MAKING_MOVE;
 	}
 	
 	// Handles joining a multi-player game
@@ -234,6 +265,10 @@ public class Game implements Runnable
 		// Sync the player board with the json data recieved 
 		var clientBoardJson = jsonGameState.get("Client Board");
 		playerBoard.deserializeBoard(clientBoardJson.toString());
+		
+		
+		state = GameState.WAITING_FOR_OPPONENT;
+		threadWakeUp();
 	}
 	
 	
@@ -273,7 +308,21 @@ public class Game implements Runnable
 			// If legal, thread is awaken and 
 			// state changed to waiting for opponent
 			
-
+			if(!isSinglePlayer)
+			{
+				System.out.println("[LOG] Sending updated gamestate to opponent.");
+				
+				Board[] boards = { playerBoard, enemyBoard };
+				
+				if(playerRole == NetworkRole.HOST)
+				{
+					server.sendToClient(boards);
+				}
+				else
+				{
+					client.sendToHost(boards);
+				}
+			}
 			
 			// Make move then state change
 			

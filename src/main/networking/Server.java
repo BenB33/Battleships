@@ -68,7 +68,24 @@ public class Server
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	
+	public String receieveFromClient()
+	{
+		String jsonGameState = "";
 		
+		try
+		{
+			DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+			jsonGameState = inputStream.readUTF();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return jsonGameState;
 	}
 }
 
