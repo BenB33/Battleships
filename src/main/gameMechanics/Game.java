@@ -134,10 +134,10 @@ public class Game implements Runnable
 					}
 					
 					JSONObject jsonGameState = new JSONObject(stringGameState);
-					var hostBoardJson = jsonGameState.get("Host Board");
+					Object hostBoardJson = jsonGameState.get("Host Board");
 					enemyBoard.deserializeBoard(hostBoardJson.toString());
 					
-					var clientBoardJson = jsonGameState.get("Client Board");
+					Object clientBoardJson = jsonGameState.get("Client Board");
 					playerBoard.deserializeBoard(clientBoardJson.toString());
 				}
 
@@ -271,11 +271,11 @@ public class Game implements Runnable
 		JSONObject jsonGameState = new JSONObject(stringGameState);
 		
 		// Sync the enemy board with the data recieved
-		var hostBoardJson = jsonGameState.get("Host Board");
+		Object hostBoardJson = jsonGameState.get("Host Board");
 		enemyBoard.deserializeBoard(hostBoardJson.toString());
 		
 		// Sync the player board with the json data recieved 
-		var clientBoardJson = jsonGameState.get("Client Board");
+		Object clientBoardJson = jsonGameState.get("Client Board");
 		playerBoard.deserializeBoard(clientBoardJson.toString());
 		
 		

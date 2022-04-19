@@ -396,7 +396,7 @@ public class Board {
         JSONObject jsonObject = new JSONObject(json);
 
         // Extract the previous moves from the board json
-        var previousMovesString = jsonObject.get("previousMoves");
+        Object previousMovesString = jsonObject.get("previousMoves");
 
         // Create a JSON array using the previous moves json
         JSONArray jsonArray = new JSONArray(previousMovesString.toString());

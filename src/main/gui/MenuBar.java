@@ -119,8 +119,13 @@ public class MenuBar {
 				JButton btnCancel = new JButton("Cancel");
 				
 				// Loading Spinner
-				ImageIcon imgLoadingSpinner = new ImageIcon(new ImageIcon("res/spinner.gif").getImage().getScaledInstance(40, 40, Image.SCALE_DEFAULT));
-				ImageIcon imgPlaceholder = new ImageIcon(new ImageIcon("res/placeholder.png").getImage().getScaledInstance(40, 40, Image.SCALE_DEFAULT));
+				ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+				
+				ImageIcon originalLoadingSpinner = new ImageIcon(classLoader.getResource("spinner.gif"));
+				ImageIcon originalPlaceholder = new ImageIcon(classLoader.getResource("placeholder.png"));
+				
+				ImageIcon imgLoadingSpinner = new ImageIcon(originalLoadingSpinner.getImage().getScaledInstance(40, 40, Image.SCALE_DEFAULT));
+				ImageIcon imgPlaceholder = new ImageIcon(originalPlaceholder.getImage().getScaledInstance(40, 40, Image.SCALE_DEFAULT));
 				JLabel lblPlaceholder = new JLabel(imgPlaceholder);
 				JLabel lblLoadingSpinner = new JLabel(imgLoadingSpinner);
 				
@@ -152,7 +157,7 @@ public class MenuBar {
 				});
 				
 				// Add ip address list to combo box
-				for(var address : ipAddressList)
+				for(String address : ipAddressList)
 				{
 					comboIPAddress.addItem(address);
 				}
@@ -189,7 +194,7 @@ public class MenuBar {
 				constraints.gridy = 2;
 				constraints.gridwidth = 2;
 				hostModalPanel.add(lblLoadingSpinner, constraints);
-				lblLoadingSpinner.setVisible(false);
+				lblLoadingSpinner.setVisible(true);
 				
 				constraints.fill = GridBagConstraints.HORIZONTAL;
 				constraints.gridx = 0;

@@ -6,10 +6,12 @@ import javax.swing.JOptionPane;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 // Regex Imports
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 // Other Imports
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -25,16 +27,16 @@ public class NetworkUtils {
 		try 
 		{
 			// Grabbing all of the network interfaces associated with the machine
-			var networkInterfaces = NetworkInterface.getNetworkInterfaces();
+			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
 			
 			// Looping through each interface
-			for(var interfaces : Collections.list(networkInterfaces))
+			for(NetworkInterface interfaces : Collections.list(networkInterfaces))
 			{
 				// Extracts all of the InetAddresses from the interfaces
-				var inetAddresses = interfaces.getInetAddresses();
+				Enumeration<InetAddress> inetAddresses = interfaces.getInetAddresses();
 				
 				// Looping through each InetAddress
-				for(var address : Collections.list(inetAddresses))
+				for(InetAddress address : Collections.list(inetAddresses))
 				{
 					// If the InetAddress is a loopback address, ignore and continue
 					if(address.isLoopbackAddress()) continue;

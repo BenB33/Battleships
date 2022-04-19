@@ -20,7 +20,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 // Other Imports
-import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
@@ -61,33 +60,35 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 			/*
 			 * Water Tiles
 			 */
-			waterTiles[0] = ImageIO.read(new File("res/water1.png"));
-			waterTiles[1] = ImageIO.read(new File("res/water2.png"));
-			waterTiles[2] = ImageIO.read(new File("res/water3.png"));
-			waterTiles[3] = ImageIO.read(new File("res/water4.png"));
-			waterTiles[4] = ImageIO.read(new File("res/water5.png"));
-			waterTiles[5] = ImageIO.read(new File("res/water6.png"));
-			waterTiles[6] = ImageIO.read(new File("res/water7.png"));
-			waterTiles[7] = ImageIO.read(new File("res/water8.png"));
-			waterTiles[8] = ImageIO.read(new File("res/water9.png"));
-			waterTiles[9] = ImageIO.read(new File("res/water10.png"));
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			
+			waterTiles[0] = ImageIO.read(classLoader.getResource("water1.png"));
+			waterTiles[1] = ImageIO.read(classLoader.getResource("water2.png"));
+			waterTiles[2] = ImageIO.read(classLoader.getResource("water3.png"));
+			waterTiles[3] = ImageIO.read(classLoader.getResource("water4.png"));
+			waterTiles[4] = ImageIO.read(classLoader.getResource("water5.png"));
+			waterTiles[5] = ImageIO.read(classLoader.getResource("water6.png"));
+			waterTiles[6] = ImageIO.read(classLoader.getResource("water7.png"));
+			waterTiles[7] = ImageIO.read(classLoader.getResource("water8.png"));
+			waterTiles[8] = ImageIO.read(classLoader.getResource("water9.png"));
+			waterTiles[9] = ImageIO.read(classLoader.getResource("water10.png"));
 			
 			/*
 			 * Ship Tiles
 			 */
-			shipTiles[0] = ImageIO.read(new File("res/shipMiddleHor.png"));
-			shipTiles[1] = ImageIO.read(new File("res/shipMiddleVer.png"));
-			shipTiles[2] = ImageIO.read(new File("res/shipEndBottom.png"));
-			shipTiles[3] = ImageIO.read(new File("res/shipEndTop.png"));
-			shipTiles[4] = ImageIO.read(new File("res/shipEndLeft.png"));
-			shipTiles[5] = ImageIO.read(new File("res/shipEndRight.png"));
-			shipTiles[6] = ImageIO.read(new File("res/shipCircle.png"));
+			shipTiles[0] = ImageIO.read(classLoader.getResource("shipMiddleHor.png"));
+			shipTiles[1] = ImageIO.read(classLoader.getResource("shipMiddleVer.png"));
+			shipTiles[2] = ImageIO.read(classLoader.getResource("shipEndBottom.png"));
+			shipTiles[3] = ImageIO.read(classLoader.getResource("shipEndTop.png"));
+			shipTiles[4] = ImageIO.read(classLoader.getResource("shipEndLeft.png"));
+			shipTiles[5] = ImageIO.read(classLoader.getResource("shipEndRight.png"));
+			shipTiles[6] = ImageIO.read(classLoader.getResource("shipCircle.png"));
 			
 			/*
 			 * Misc Tiles
 			 */
-			miscTiles[0] = ImageIO.read(new File("res/fire.png"));
-			miscTiles[1] = ImageIO.read(new File("res/miss.png"));
+			miscTiles[0] = ImageIO.read(classLoader.getResource("fire.png"));
+			miscTiles[1] = ImageIO.read(classLoader.getResource("miss.png"));
 			
 		}
 		catch (IOException e){ e.printStackTrace(); }
