@@ -30,6 +30,10 @@ public class Game implements Runnable
 	private Server server = null;
 	private Client client = null;
 	
+	// IP and port of connected client
+	String connectedIPAddress = "";
+	String connectedPort = "";
+	
 	
 	public Game()
 	{
@@ -221,6 +225,10 @@ public class Game implements Runnable
 	// Handles hosting a multi-player game
 	public synchronized void hostMultiplayerGame(String ipAddress, String port)
 	{
+		// Set network member variables
+		connectedIPAddress = ipAddress;
+		connectedPort = port;
+		
 		System.out.println(ipAddress + ":" + port);
 		isSinglePlayer = false;
 		playerRole = NetworkRole.HOST;
@@ -245,6 +253,10 @@ public class Game implements Runnable
 	// Handles joining a multi-player game
 	public synchronized void joinMultiplayerGame(String ipAddress, String port)
 	{
+		// Set network member variables
+		connectedIPAddress = ipAddress;
+		connectedPort = port;
+		
 		System.out.println(ipAddress + ":" + port);
 		isSinglePlayer = false;
 		playerRole = NetworkRole.CLIENT;
@@ -392,19 +404,49 @@ public class Game implements Runnable
 		{
 			title = "LOSER!";
 		}
+		
 		int result = JOptionPane.showConfirmDialog(null, "Would you like a rematch?", title, JOptionPane.YES_NO_OPTION);
 		
 		if(result == JOptionPane.YES_OPTION)
 		{
 			// Rematch
 			System.out.println("YES OPTION CHOSEN");
-			startSingleplayerGame();
+			if(isSinglePlayer)
+			{
+				startSingleplayerGame();
+			}
+			else
+			{
+				if(playerRole == NetworkRole.HOST)
+				{
+					// Shut down existing server and start up 
+					// another with the rematch game.
+					server.shutdown();
+					hostMultiplayerGame(connectedIPAddress, connectedPort);
+				}
+				else
+				{
+					// Shut down existing server and join 
+					// another with the rematch game.
+					client.shutdown();
+					joinMultiplayerGame(connectedIPAddress, connectedPort);
+				}
+			}
+			
 		}
 		else if(result == JOptionPane.NO_OPTION)
 		{
 			// End game
 			System.out.println("NO OPTION CHOSEN");
-			Game.game.endSinglePlayerGame();
+			if(isSinglePlayer)
+			{
+				Game.game.endSinglePlayerGame();
+			}
+			else
+			{
+				// End multiplayer game
+				System.out.println("[LOG] End multiplayer game.");
+			}
 		}
 	}
 	

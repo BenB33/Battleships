@@ -87,6 +87,19 @@ public class Server
 		
 		return jsonGameState;
 	}
+	
+	public void shutdown()
+	{
+		// Shutdown the connected socket
+		try
+		{
+			socket.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
 }
 
 
