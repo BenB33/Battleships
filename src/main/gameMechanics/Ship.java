@@ -95,13 +95,23 @@ public class Ship {
     {
         // Create a JSON Object using the ship json passed to function
         JSONObject jsonObject = new JSONObject(json);
+        
+        String shipOrient = jsonObject.getString("shipOrientation");
+        if(shipOrient.equals("VERTICAL"))
+        {
+        	shipOrientation = ShipOrientation.VERTICAL;
+        }
+        else
+        {
+        	shipOrientation = ShipOrientation.HORIZONTAL;
+        }
 
         // Extract the ship from the json
         shipLength = jsonObject.getInt("shipLength");
         shipXPosition = jsonObject.getInt("shipXPosition");
         shipYPosition = jsonObject.getInt("shipYPosition");
 
-        boolean[] shipHitTiles = new boolean[shipLength];
+        shipHitTiles = new boolean[shipLength];
 
         JSONArray hitTiles = new JSONArray(jsonObject.get("shipHitTiles").toString());
         for(int i = 0; i < shipLength; i++)

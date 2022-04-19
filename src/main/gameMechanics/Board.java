@@ -3,30 +3,38 @@ package main.gameMechanics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Board {
 
-	public Board() 
-	{
-		
-	}
+	// Array contains number of each ship size
+	// [2 x 1] [2 x 2] [1 x 3] [1 x 4] [1 x 5]
+	final static private int[] SHIP_LENGTH_QTY = {2, 2, 1, 1, 1};
 	
 	// Create an array list of ships
-	List<Ship> ships = new ArrayList<Ship>();
+	List<Ship> ships = null;
 	boolean[][] previousMoves = new boolean[10][10];
 	
-	
+	public Board() 
+	{
+		ships = new ArrayList<Ship>();
+		
+		// Loop will run for the sum of values in SHIP_LENGTH_QTY
+		// and initialise a ship for each loop.
+		for(int i = 0; i < IntStream.of(SHIP_LENGTH_QTY).sum(); i++)
+		{
+			ships.add(new Ship(ShipOrientation.HORIZONTAL, 0, 0, 0));
+		}
+	}
+
 	
 	public void placeShipsAtRandom()
 	{
 		resetBoard();
-		
-		// Array contains number of each ship size
-		// [2 x 1] [2 x 2] [1 x 3] [1 x 4] [1 x 5]
-		int[] shipLengthQty = {2, 2, 1, 1, 1};
+
 		
 		// Create random seed
 		Random rand = new Random();
@@ -40,12 +48,15 @@ public class Board {
 				legalTiles[i][j] = true;
 			}
 		}
-
+		
+		// Reset the array list to place ships
+		ships = new ArrayList<Ship>();
+		
 		// Looping through each ship
-		for(int i = 0; i < shipLengthQty.length; i++)
+		for(int i = 0; i < SHIP_LENGTH_QTY.length; i++)
 		{
 			// Looping through each tile of the current ship
-			for(int j = 0; j < shipLengthQty[i]; j++)
+			for(int j = 0; j < SHIP_LENGTH_QTY[i]; j++)
 			{
 				boolean shipPlaced = false;
 				while(!shipPlaced)
@@ -406,12 +417,36 @@ public class Board {
             }
         }
 
-
+        // JSON containing all of the ships
         JSONObject shipMap = new JSONObject(jsonObject.get("ships").toString());
-
+        // Setting new ArrayList for ships about to be deserialized
+        ships = new ArrayList<Ship>();
+        
+        // Looping through each ship in the json ship man and
+        // creating a new ship object with the data passed.
         for(int i = 0; i < shipMap.length(); i++)
         {
-        	ships.get(i).deserializeShip(shipMap.get("Ship " + (i)).toString());
+        	Ship ship = new Ship(null, 0, 0, 0);
+        	ship.deserializeShip(shipMap.get("Ship " + (i)).toString());
+        	ships.add(ship);
         }
     }
+    
+	@Override
+	public String toString()
+	{
+		JSONObject json = new JSONObject();
+		json.put("previousMoves", previousMoves);
+		
+		JSONObject shipJson = new JSONObject();
+		
+		for(int i = 0; i < ships.size(); i++)
+		{
+			shipJson.put("Ship " + i, ships.get(i));
+		}
+		
+		json.put("ships", shipJson);
+		
+		return json.toString();
+	}
 }

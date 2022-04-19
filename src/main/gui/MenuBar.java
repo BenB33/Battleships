@@ -6,13 +6,18 @@ import main.networking.NetworkUtils;
 
 // AWT Imports
 import java.awt.Dialog;
-import java.awt.GridLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Image;
+
+// Other
 import java.util.ArrayList;
 
 // Swing Imports
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -101,17 +106,24 @@ public class MenuBar {
 				JDialog hostModal = new JDialog(frame, "Host a game!", Dialog.ModalityType.DOCUMENT_MODAL);
 				
 				// Create panel for host dialog box
-				JPanel hostModalPanel = new JPanel();
-				hostModalPanel.setLayout(new GridLayout(3, 2));
+				JPanel hostModalPanel = new JPanel(new GridBagLayout());
+				GridBagConstraints constraints = new GridBagConstraints();
 				hostModalPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 				
 				// Create and add labels to the panel
 				JLabel lblIPTitle = new JLabel("Your IP Address: \n", SwingConstants.RIGHT);
 				JLabel lblPortTitle = new JLabel("Your Port: \n", SwingConstants.RIGHT);
-				JComboBox comboIPAddress = new JComboBox();
-				JTextField lblPort = new JTextField(String.valueOf(port));
-				JButton btnHost = new JButton("Host Local Game");
+				JComboBox<String> comboIPAddress = new JComboBox<>();
+				JTextField txtPort = new JTextField(String.valueOf(port));
+				JButton btnHost = new JButton("Host Game");
 				JButton btnCancel = new JButton("Cancel");
+				
+				// Loading Spinner
+				ImageIcon imgLoadingSpinner = new ImageIcon(new ImageIcon("res/spinner.gif").getImage().getScaledInstance(40, 40, Image.SCALE_DEFAULT));
+				ImageIcon imgPlaceholder = new ImageIcon(new ImageIcon("res/placeholder.png").getImage().getScaledInstance(40, 40, Image.SCALE_DEFAULT));
+				JLabel lblPlaceholder = new JLabel(imgPlaceholder);
+				JLabel lblLoadingSpinner = new JLabel(imgLoadingSpinner);
+				
 				
 				// Add action listener to the cancel button
 				btnHost.addActionListener(new ActionListener()
@@ -119,8 +131,12 @@ public class MenuBar {
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
+						lblLoadingSpinner.setVisible(true);
+						lblLoadingSpinner.repaint();
+
 						// Host game over TCP connection
-						Game.game.hostMultiplayerGame();
+						Game.game.hostMultiplayerGame(comboIPAddress.getSelectedItem().toString(), txtPort.getText());
+						hostModal.dispose();
 					}
 				});
 				
@@ -135,20 +151,56 @@ public class MenuBar {
 					}
 				});
 				
-				// Add labels to the dialog panel
-				lblIPTitle.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
-				hostModalPanel.add(lblIPTitle);
-				
+				// Add ip address list to combo box
 				for(var address : ipAddressList)
 				{
 					comboIPAddress.addItem(address);
 				}
 				
-				hostModalPanel.add(comboIPAddress);
-				hostModalPanel.add(lblPortTitle);
-				hostModalPanel.add(lblPort);
-				hostModalPanel.add(btnHost);
-				hostModalPanel.add(btnCancel);
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 0;
+				constraints.gridy = 0;
+				hostModalPanel.add(lblIPTitle, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 1;
+				constraints.gridy = 0;
+				hostModalPanel.add(comboIPAddress, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 0;
+				constraints.gridy = 1;
+				hostModalPanel.add(lblPortTitle, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 1;
+				constraints.gridy = 1;
+				hostModalPanel.add(txtPort, constraints);
+
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 0;
+				constraints.gridy = 2;
+				constraints.gridwidth = 2;
+				hostModalPanel.add(lblPlaceholder, constraints);
+				lblLoadingSpinner.setVisible(true);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 0;
+				constraints.gridy = 2;
+				constraints.gridwidth = 2;
+				hostModalPanel.add(lblLoadingSpinner, constraints);
+				lblLoadingSpinner.setVisible(false);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 0;
+				constraints.gridy = 3;
+				constraints.gridwidth = 1;
+				hostModalPanel.add(btnHost, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 1;
+				constraints.gridy = 3;
+				hostModalPanel.add(btnCancel, constraints);
 				
 				// Configure the host dialog panel
 				hostModal.add(hostModalPanel);
@@ -175,8 +227,8 @@ public class MenuBar {
 				JDialog joinDialog = new JDialog(frame, "Join a player!", Dialog.ModalityType.DOCUMENT_MODAL);
 				
 				// Create panel for join dialog box
-				JPanel joinDialogPanel = new JPanel();
-				joinDialogPanel.setLayout(new GridLayout(3, 2));
+				JPanel joinDialogPanel = new JPanel(new GridBagLayout());
+				GridBagConstraints constraints = new GridBagConstraints();
 				joinDialogPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 				
 				// Create widgets for join dialog panel
@@ -188,12 +240,35 @@ public class MenuBar {
 				JButton btnCancel = new JButton("Cancel");
 				
 				// Add widgets to the join dialog panel
-				joinDialogPanel.add(lblIPAddress);
-				joinDialogPanel.add(txtIpAddress);
-				joinDialogPanel.add(lblPort);
-				joinDialogPanel.add(txtPort);
-				joinDialogPanel.add(btnConnect);
-				joinDialogPanel.add(btnCancel);
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 0;
+				constraints.gridy = 0;
+				joinDialogPanel.add(lblIPAddress, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 1;
+				constraints.gridy = 0;
+				joinDialogPanel.add(txtIpAddress, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 0;
+				constraints.gridy = 1;
+				joinDialogPanel.add(lblPort, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 1;
+				constraints.gridy = 1;
+				joinDialogPanel.add(txtPort, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 0;
+				constraints.gridy = 2;
+				joinDialogPanel.add(btnConnect, constraints);
+				
+				constraints.fill = GridBagConstraints.HORIZONTAL;
+				constraints.gridx = 1;
+				constraints.gridy = 2;
+				joinDialogPanel.add(btnCancel, constraints);
 				
 				// Add action listener to the connect button
 				btnConnect.addActionListener(new ActionListener()
@@ -206,7 +281,7 @@ public class MenuBar {
 						// of the join pop-up modal.
 						if(NetworkUtils.ipPortValidation(txtIpAddress.getText(), txtPort.getText(), joinDialog))
 						{
-							Game.game.joinMultiplayerGame();
+							Game.game.joinMultiplayerGame(txtIpAddress.getText(), txtPort.getText());
 							joinDialog.dispose();
 						}
 					}

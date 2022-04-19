@@ -166,7 +166,7 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 		else if(identifier == BoardOwner.ENEMY)
 		{
 			drawSunkenShips(Game.game.getEnemyShipArray(), g);
-			//drawAllShips(Game.game.getEnemyShipArray(), g);
+			drawAllShips(Game.game.getEnemyShipArray(), g);
 			drawHitIndicators(Game.game.getEnemyShipArray(), g);
 			drawMiss(g);
 		}
