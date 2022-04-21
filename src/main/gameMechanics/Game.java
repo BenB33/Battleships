@@ -11,32 +11,35 @@ import main.networking.Client;
 import main.networking.Server;
 
 // State machine that follows flow chart
-public class Game implements Runnable 
-{
+public class Game implements Runnable{
 	// Game loop thread
 	private Thread gameThread = new Thread(this);
 	
+	// Instance of game
 	public static Game game = new Game();
 	
 	// Initialise the game state
 	private GameState state = GameState.WAITING_FOR_PLAY_DECISION;
 
+	// Setting flags
 	private boolean isSinglePlayer = false;
+	boolean isHostTurn = true;
 	NetworkRole playerRole;
 	
+	// Instances for each player's board
 	Board playerBoard;
 	Board enemyBoard;
 	
+	// Setting server/client to null before hand
 	private Server server = null;
 	private Client client = null;
 	
 	// IP and port of connected client
 	String connectedIPAddress = "";
 	String connectedPort = "";
+
 	
-	
-	public Game()
-	{
+	public Game(){
 		// Creating instances of each board
 		playerBoard = new Board();
 		enemyBoard = new Board();
@@ -49,37 +52,31 @@ public class Game implements Runnable
 		gameThread.start();
 	}
 	
-	// Ship Array Getters for each board
-	public List<Ship> getPlayerShipArray()
-	{
-		return playerBoard.ships;
-	}
-	public List<Ship> getEnemyShipArray()
-	{
-		return enemyBoard.ships;
-	}
 
+	// The run function handles each game state. The while loop
+	// contains a switch case that, depending on the current
+	// game state, performs certain actions
+	//
 	@Override
-	public void run()
-	{
-		System.out.println("Game Instance Created...\n");
-		while(true)
-		{
-			switch(state)
-			{
+	public void run(){
+		System.out.println("[LOG] Game Instance Created");
+		while(true){
+			switch(state){
 			case WAITING_FOR_PLAY_DECISION:
-				System.out.println("[State] Waiting for play decision...\n");
-				threadSleep();
+				// WAITING_FOR_PLAY_DECISION state is where the player
+				// is waiting for singleplayer/multiplayer decision
+				System.out.println("[State] Waiting for play decision");
 				
+				threadSleep();
 				break;
 				
 			case PLACING_SHIP:
-				System.out.println("[State] Placing Ships...\n");
+				// PLACING_SHIPS state is where the game places the
+				// ships for both boards at random
+				System.out.println("[State] Placing Ships");
 				
-				if(isSinglePlayer)
-				{
-					//Single Player
-					
+				// If singleplayer is selected
+				if(isSinglePlayer){
 					// Create random variations of both the 
 					// player and enemy boards
 					playerBoard.placeShipsAtRandom();
@@ -89,106 +86,106 @@ public class Game implements Runnable
 					// player is ready to make move so state is changed
 					state = GameState.MAKING_MOVE;
 				}
-				else
-				{
-					// Multi-Player
-
-					// The host randomises both the player
-					// and enemy boards and then sends those
-					// boards to the client connected.					
-				}
-
 				break;
 				
 			case MAKING_MOVE:
-				// Local player makes move
-				// While in the MAKING_MOVE state, the player
-				// is able to click tiles to make moves.
-				System.out.println("[State] Making move...\n");
-
+				// MAKING_MOVE state is where the local player is making
+				// their move. The player is able to click a tile to move
+				System.out.println("[State] Making move");
+				
 				threadSleep();
 				break;
 				
 			case WAITING_FOR_OPPONENT:
-				// CPU/multiplayer opponent makes move
-				System.out.println("[State] Opponent Move...\n");
-				
-				if(isSinglePlayer)
-				{
-					computerMakeMove();
-				}
-				else
-				{
-					// Multiplayer
+				// WAITING_FOR_OPPONENT state is where the opponent player is
+				// making their move. The local player must wait while the move
+				// is being carried out. For single player games, this state is
+				// where the CPU's move will be carried out.
+				System.out.println("[State] Opponent Move");
+
+				// For singleplayer games, CPU move is made
+				if(isSinglePlayer) computerMakeMove();
+				// For multiplayer games, gamestate data will be receieved
+				// from the opponent once their move has been made
+				else{
 					System.out.println("[LOG] Receiving gamestate from opponent");
 					
 					String stringGameState = "";
 					
-					if(playerRole == NetworkRole.HOST)
-					{
-						stringGameState = server.receieveFromClient();
-					}
-					else
-					{
-						stringGameState = client.receiveFromHost();
-					}
+					// Depending on the player's role, receive data from client or host
+					if(playerRole == NetworkRole.HOST) stringGameState = server.receieveFromClient();
+					else stringGameState = client.receiveFromHost();
 					
+					// Deserialize the data received for both boards
 					JSONObject jsonGameState = new JSONObject(stringGameState);
 					Object hostBoardJson = jsonGameState.get("Host Board");
 					enemyBoard.deserializeBoard(hostBoardJson.toString());
-					
 					Object clientBoardJson = jsonGameState.get("Client Board");
 					playerBoard.deserializeBoard(clientBoardJson.toString());
 				}
-
 				
-				if(playerBoard.playerHasLostTheGame())
-				{
-					state = GameState.OPPONENT_HAS_WON;
-				}
-				else
-				{
-					state = GameState.MAKING_MOVE;
-				}
+				// If the player has lost the game, change state accordingly, if not
+				// continue on with the game.
+				if(playerBoard.playerHasLostTheGame()) state = GameState.OPPONENT_HAS_WON;
+				else state = GameState.MAKING_MOVE;
 				break;
 				
 			case PLAYER_HAS_WON:
+				// PLAYER_HAS_WON state is where if the local player
+				// has won the game, the rematch modal is triggered
 				System.out.println("[State] PLAYER HAS WON THE GAME!");
+				
 				rematchModalPopup();
 				break;
 				
 			case OPPONENT_HAS_WON:
+				// OPPONENT_HAS_WON state is where if the opponent player
+				// has won the game, the rematch modal is triggered
 				System.out.println("[State] OPPONENT HAS WON THE GAME!");
+				
 				rematchModalPopup();
-				// TODO: Add modal prompting for game replay
+				break;
+				
+			case WAITING_FOR_HOST_REMATCH_DECISION:
+				// WAITING_FOR_HOST_REMATCH_DECISION state is where the host
+				// is prompted with a rematch modal, they made the decision
+				// before the client is prompted with the modal.
+				System.out.println("[State] Waiting for host rematch decision");
 				break;
 			}
 		}
 	}
 	
-	private synchronized void threadSleep()
-	{
-		try 
-		{
+	
+	// The thread is told to sleep by calling
+	// wait on it
+	//
+	private synchronized void threadSleep(){
+		try {
 			this.wait();
 		}
-		catch(InterruptedException e) 
-		{
+		catch(InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private synchronized void threadWakeUp()
-	{		
+	
+	// In order to wake the thread up, 
+	// notifyAll is called
+	//
+	private synchronized void threadWakeUp(){		
 		// Notify the thread, waking it up
-		synchronized(gameThread)
-		{
+		synchronized(gameThread){
 			this.notifyAll();
 		}
 	}
 	
-	public synchronized void startSingleplayerGame()
-	{
+	
+	// A single player game will start, boards are reset
+	// to ensure to overlap happens, then the gamestate is 
+	// updated and the thread is awaken to start the game
+	//
+	public synchronized void startSingleplayerGame(){
 		playerBoard.resetBoard();
 		enemyBoard.resetBoard();
 		
@@ -198,10 +195,12 @@ public class Game implements Runnable
 		threadWakeUp();			
 	}
 	
-	public synchronized void endSinglePlayerGame()
-	{
-		// The single player game will be ended so the 
-		// state will change back to waiting for play decision
+	
+	// The single player game will be ended and the boards are
+	// reset ready for another game to start. Gamestate is updated
+	//
+	public synchronized void endSinglePlayerGame(){
+
 		state = GameState.WAITING_FOR_PLAY_DECISION;
 		isSinglePlayer = false;
 		// Both the player and enemy boards are
@@ -212,34 +211,34 @@ public class Game implements Runnable
 		threadWakeUp();
 	}
 	
-	public synchronized void playerBoardClicked(int x, int y)
-	{
-		if (state == GameState.PLACING_SHIP)
-		{
-			// Place ship on that tile
-			System.out.println("x: " + x + " y: " + y);
-		}
+	
+	// Debug function to display the coordinates when user clicks their own board
+	//
+	public synchronized void playerBoardClicked(int x, int y){
+		if (state == GameState.PLACING_SHIP) System.out.println("x: " + x + " y: " + y);
+
 	}
 	
 	
-	// Handles hosting a multi-player game
-	public synchronized void hostMultiplayerGame(String ipAddress, String port)
-	{
-		// Set network member variables
-		connectedIPAddress = ipAddress;
-		connectedPort = port;
-		
-		System.out.println(ipAddress + ":" + port);
+	// Handles a host hosting a multi-player game. Using the passed IP Address
+	// and port, a server object is created and used to send the initial
+	// game state data to the client.
+	//
+	public synchronized void hostMultiplayerGame(String ipAddress, String port){
+		// Update isSinglePlayer flag and playerRole as host
 		isSinglePlayer = false;
 		playerRole = NetworkRole.HOST;
-		
-		// TODO: Add host game functionality
+		// Set network variables to create Server object and start the server
+		connectedIPAddress = ipAddress;
+		connectedPort = port;
 		client = null;		
 		server = new Server(ipAddress, port);
-		server.Start();
+		server.start();
 		
-		// Generate the ships randomly on both boards
-		// to start the game
+		System.out.println(ipAddress + ":" + port);
+
+		// Generate the ships randomly on both
+		// boards to start the game
 		playerBoard.placeShipsAtRandom();
 		enemyBoard.placeShipsAtRandom();
 		
@@ -250,21 +249,23 @@ public class Game implements Runnable
 		state = GameState.MAKING_MOVE;
 	}
 	
-	// Handles joining a multi-player game
-	public synchronized void joinMultiplayerGame(String ipAddress, String port)
-	{
-		// Set network member variables
-		connectedIPAddress = ipAddress;
-		connectedPort = port;
-		
-		System.out.println(ipAddress + ":" + port);
+	
+	// Handles a client joining a multi-player game. Using the passed IP Address
+	// and port, a client object is created and used to receieve the initial
+	// game state data from the host.
+	//
+	public synchronized void joinMultiplayerGame(String ipAddress, String port){
+		// Update isSinglePlayer flag and playerRole as client
 		isSinglePlayer = false;
-		playerRole = NetworkRole.CLIENT;
-		
-		// TODO: Add join game functionality
+		playerRole     = NetworkRole.CLIENT;
+		// Set network variables to create Client object
+		connectedIPAddress = ipAddress;
+		connectedPort      = port;
 		server = null;
 		client = new Client(ipAddress, port);
 		
+		System.out.println(ipAddress + ":" + port);
+
 		// Receive the json game state that was 
 		// generated by the host
 		String stringGameState = client.receiveFromHost();
@@ -278,202 +279,195 @@ public class Game implements Runnable
 		Object clientBoardJson = jsonGameState.get("Client Board");
 		playerBoard.deserializeBoard(clientBoardJson.toString());
 		
-		
+		// Update the game state and wake up the thread
 		state = GameState.WAITING_FOR_OPPONENT;
 		threadWakeUp();
 	}
 	
-	
-	// -----------
-	// Making Move
-	// ------------
-	
-	public synchronized void enemyBoardClicked(int x, int y)
-	{
-		if (state == GameState.MAKING_MOVE)
-		{
-			// Shoot a bomb
-			
-			// Check if move is legal
-			if(!enemyBoard.isMoveLegal(x, y))
-			{
-				// Move is not legal, player is required
-				// to click again.
-				
-				// Maybe print error message
-				return;
-			}
+
+	// When the enemy board has been clicked, multiple checks
+	// are carried out to ensure if a move has been made, it is legal
+	// and if needed, can be sent to the opponent.
+	//
+	public synchronized void enemyBoardClicked(int x, int y){
+		if (state == GameState.MAKING_MOVE){			
+			// If move is considered illegal, return the function
+			if(!enemyBoard.isMoveLegal(x, y)) return;
 			
 			// Add the current move that has been determined legal
 			// to the previous moves list for the enemy board.
 			enemyBoard.previousMoves[x][y]=true;
 			
 			// Apply the move that has been deemed legal
-			if(enemyBoard.applyMove(x, y))
-			{
+			if(enemyBoard.applyMove(x, y)){
 				// Move has been detected as a hit
 				
-				// Maybe print out a message or
-				// start animation. Will decide later
+				// TODO: Add hit sound
 			}
 			
-			// If legal, thread is awaken and 
-			// state changed to waiting for opponent
-			
-			if(!isSinglePlayer)
-			{
+			// If multiplayer
+			if(!isSinglePlayer){
 				System.out.println("[LOG] Sending updated gamestate to opponent.");
-				
 				Board[] boards = { playerBoard, enemyBoard };
 				
-				if(playerRole == NetworkRole.HOST)
-				{
-					server.sendToClient(boards);
-				}
-				else
-				{
-					client.sendToHost(boards);
-				}
+				// Determine what the player's role is, then send the board data to their opponent
+				if(playerRole == NetworkRole.HOST)        server.sendToClient(boards);
+				else if(playerRole == NetworkRole.CLIENT) client.sendToHost(boards);
 			}
-			
-			// Make move then state change
-			
-			// TODO: Look at game winning synchonization point
-			// Check if the game is over and the opponent has won
-			if(enemyBoard.playerHasLostTheGame())
-			{
-				// Game is over
-				state = GameState.PLAYER_HAS_WON;
-			}
-			else
-			{
-				state = GameState.WAITING_FOR_OPPONENT;				
-			}
+
+			// If the enemy has lost the game, update the state accordingly, otherwise
+			// continue with the game.
+			if(enemyBoard.playerHasLostTheGame()) state = GameState.PLAYER_HAS_WON;
+			else state = GameState.WAITING_FOR_OPPONENT;	
 			threadWakeUp();
 		}
 	}
 
 	
-	public synchronized void computerMakeMove()
-	{
-		if(state == GameState.WAITING_FOR_OPPONENT)
-		{
-			// Create random x and y coordinates
-			// to work out the move position
+	// The CPU move will be determined and made. Checks to ensure the randomly
+	// generated move is legal.
+	//
+	public synchronized void computerMakeMove(){
+		if(state == GameState.WAITING_FOR_OPPONENT){
+			// Generate random move x and y coordinates
 			Random rand = new Random();	
 			System.out.println("Rolling random coordinates...");
 			int x = rand.nextInt(10);
 			int y = rand.nextInt(10);
 			
-			// If the move isn't legal, return the function
-			while(!playerBoard.isMoveLegal(x, y))
-			{
-				System.out.println("Move was illegal. Rerolling...");
+			// If the move is determined illegal, generate new coordinates
+			// until they are legal
+			while(!playerBoard.isMoveLegal(x, y)){
+				System.out.println("[LOG] Move was illegal. Rerolling...");
 				x = rand.nextInt(10);
 				y = rand.nextInt(10);
 			}
 
-			// Add NPC move to the previous moves list
+			// Add CPU's move to the previous moves list
 			// after it has been determined legal
 			playerBoard.previousMoves[x][y]=true;
 			
 			// Check if move is a hit
-			if(playerBoard.applyMove(x, y))
-			{
-				// Move has been detected as a hit
-				System.out.println("Move was a hit!");
-			}
+			if(playerBoard.applyMove(x, y)) System.out.println("Move was a hit!");
 			
-			if(playerBoard.playerHasLostTheGame())
-			{
-				// Game is over
-				state = GameState.PLAYER_HAS_WON;
-			}	
+			// Check if the player has lost the game
+			if(playerBoard.playerHasLostTheGame()) state = GameState.PLAYER_HAS_WON;
 		}
 	}
 	
-	// TODO: Move to GUI class maybe
-	private void rematchModalPopup()
-	{
+	
+	// The rematch modal prompts players asking whether they would like
+	// a rematch or not. If they choose yes, a new game with the same
+	// opponent is setup, if no, the players client's are reset and
+	// waiting for a new play decision
+	//
+	private void rematchModalPopup(){
+		// The modal title is determined for the winner and the loser
 		String title;
-		if(state == GameState.PLAYER_HAS_WON)
-		{
-			title = "WINNER!";
-		}
-		else
-		{
-			title = "LOSER!";
-		}
+		if(state == GameState.PLAYER_HAS_WON) title = "WINNER!";
+		else 								  title = "LOSER!";
 		
+		// An option pane is built, returning the yes/no result in integer form
 		int result = JOptionPane.showConfirmDialog(null, "Would you like a rematch?", title, JOptionPane.YES_NO_OPTION);
 		
-		if(result == JOptionPane.YES_OPTION)
-		{
-			// Rematch
-			System.out.println("YES OPTION CHOSEN");
-			if(isSinglePlayer)
-			{
-				startSingleplayerGame();
-			}
+		// If the user chooses yes to a rematch
+		if(result == JOptionPane.YES_OPTION){
+			// If singleplayer game, call startSingleplayerGame
+			if(isSinglePlayer) startSingleplayerGame();
+			// If multiplayer, the player role is determined
 			else
 			{
-				if(playerRole == NetworkRole.HOST)
-				{
-					// Shut down existing server and start up 
-					// another with the rematch game.
-					server.shutdown();
-					hostMultiplayerGame(connectedIPAddress, connectedPort);
+				// If the player is host, new sets of ships are generated
+				// and sent to the client for them to parse. The game state
+				// is then updated
+				if(playerRole == NetworkRole.HOST){					
+					playerBoard.placeShipsAtRandom();
+					enemyBoard.placeShipsAtRandom();
+					
+					Board[] boards = { playerBoard, enemyBoard };
+					server.sendToClient(boards);
+					
+					state = GameState.MAKING_MOVE;
 				}
-				else
-				{
-					// Shut down existing server and join 
-					// another with the rematch game.
-					client.shutdown();
-					joinMultiplayerGame(connectedIPAddress, connectedPort);
+				// If the player is client, they receieve a new set of boards from
+				// the host, deserialize them so they are loaded into memory and
+				// drawn on the board GUIs. The game state is then updated.
+				else if (playerRole == NetworkRole.CLIENT){
+					String stringGameState   = client.receiveFromHost();
+					JSONObject jsonGameState = new JSONObject(stringGameState);
+					
+					// Sync the enemy board with the data recieved
+					Object hostBoardJson = jsonGameState.get("Host Board");
+					enemyBoard.deserializeBoard(hostBoardJson.toString());
+					
+					// Sync the player board with the json data recieved 
+					Object clientBoardJson = jsonGameState.get("Client Board");
+					playerBoard.deserializeBoard(clientBoardJson.toString());
+					
+					state = GameState.WAITING_FOR_OPPONENT;
+					threadWakeUp();
 				}
 			}
 			
 		}
-		else if(result == JOptionPane.NO_OPTION)
-		{
-			// End game
-			System.out.println("NO OPTION CHOSEN");
-			if(isSinglePlayer)
-			{
-				Game.game.endSinglePlayerGame();
-			}
-			else
-			{
+		// If the user chooses no to a rematch
+		else if(result == JOptionPane.NO_OPTION){
+			// No match is desired so if singleplayer, endSinglePlayer function is called
+			if(isSinglePlayer) Game.game.endSinglePlayerGame();
+			// If multiplayer, the player role is determined
+			else{
 				// End multiplayer game
-				System.out.println("[LOG] End multiplayer game.");
+				// If the player is host, server.shutdown is called,
+				// the boards are reset and the game state is updated
+				if(playerRole == NetworkRole.HOST){
+					server.shutdown();
+					playerBoard.resetBoard();
+					enemyBoard.resetBoard();
+					state = GameState.WAITING_FOR_PLAY_DECISION;
+				}
+				// If the player is client, client.shutdown is called,
+				// the boards are reset and the game state is updated
+				else if (playerRole == NetworkRole.CLIENT){
+					client.shutdown();
+					playerBoard.resetBoard();
+					enemyBoard.resetBoard();
+					state = GameState.WAITING_FOR_PLAY_DECISION;
+				}
 			}
 		}
 	}
 	
-	public Board getPlayerBoard()
-	{
-		return playerBoard;
-	}
-	public Board getEnemyBoard()
-	{
-		return enemyBoard;
-	}
-	
-    public void deserializeGame(String json)
-    {
+
+	// Deserializes json passed to the function and passes
+	//  the deserialized boards to the respective functions
+	//  for the boards to then be deserialized seperately
+	//
+    public void deserializeGame(String json){
         JSONObject jsonObject = new JSONObject(json);
 
         // Detect which board is the host and which one is the client
         // and deserialize the game boards accordingly
-        if(playerRole == NetworkRole.HOST)
-        {
+        if(playerRole == NetworkRole.HOST){
         	playerBoard.deserializeBoard(jsonObject.get("Host Board").toString());
         	enemyBoard.deserializeBoard(jsonObject.get("Client Board").toString());
         }
-        else if(playerRole == NetworkRole.CLIENT)
-        {
+        else if(playerRole == NetworkRole.CLIENT){
         	enemyBoard.deserializeBoard(jsonObject.get("Host Board").toString());
         	playerBoard.deserializeBoard(jsonObject.get("Client Board").toString());
         }
+    }
+    
+    
+    // Getters and setters
+    //
+	public Board getPlayerBoard()          { return playerBoard; }
+	public Board getEnemyBoard()           { return enemyBoard; }
+	public int getRemainingShipIndicator() { return enemyBoard.getRemainingShipAmount(); }
+	public List<Ship> getPlayerShipArray() { return playerBoard.ships; }
+	public List<Ship> getEnemyShipArray() { return enemyBoard.ships; }
+    
+	public String getTurnIndicator(){
+    	if(state == GameState.WAITING_FOR_OPPONENT) return "Enemy's";
+    	else 										return "Your's";
     }
 }

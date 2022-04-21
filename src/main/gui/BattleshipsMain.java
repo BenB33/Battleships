@@ -10,23 +10,25 @@ import javax.swing.JMenuBar;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class BattleshipsMain
-{
+import main.gameMechanics.Game;
+
+public class BattleshipsMain{
 	// Global Frame
 	private static JFrame frame = null;
 	
-	public static void main(String[] args) 
-	{
+	public static void main(String[] args){
+		// Initialize a GUILayout to later add to the main frame
+		GUILayout gui = new GUILayout();
 		// Set look and feel to target device
-		try {
+		try{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
+		} 
+		catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
 			System.err.println("[LOG] Failed to set host look and feel.\nDefaulting to JAVA L&F.");
 			e.printStackTrace();
 		}
 		
-		// Initialise Frame
+		// Initialize Frame
 		frame = new JFrame("Battleships - 18142915");
 		
 		// Set frame parameters 
@@ -36,15 +38,17 @@ public class BattleshipsMain
 		
 		// Set frame's layout and add GUI_Panel
 		frame.setLayout(new BorderLayout());
-		frame.add(new GUILayout(), BorderLayout.CENTER);
+		frame.add(gui, BorderLayout.CENTER);
 
 		// Centre the frame to the monitor
 		frame.setLocationRelativeTo(null);
 		
+		// Initialize the menu bar and populate it
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 		MenuBar.populateMenuBar(menuBar, frame);		
 		
+		// Finally set the frame to be visible
 		frame.setVisible(true);
 		
 		
@@ -59,27 +63,21 @@ public class BattleshipsMain
 		long lastTime = System.currentTimeMillis();
 		final long FRAME_TIME = 1000 / 30;
 		
-		while(frame.isVisible())
-		{
-			// Repaint the whole frame
+		while(frame.isVisible()){
+			// Setting the info labels (Who's turn it is/remaining unsunk ships) and repaint the frame
+			gui.setInfoLabels(Game.game.getTurnIndicator(), Game.game.getRemainingShipIndicator());
 			frame.repaint();
 			
 			long currentTime = System.currentTimeMillis();
 			long deltaTime = currentTime - lastTime;
-			
 			lastTime = currentTime;
 			
 			// If deltaTime is less than the time set for
 			// a frame, the thread will sleep.
-			try
-			{
-				if(deltaTime < FRAME_TIME)
-				{
-					Thread.sleep(FRAME_TIME - deltaTime);
-				}
+			try{
+				if(deltaTime < FRAME_TIME) Thread.sleep(FRAME_TIME - deltaTime);
 			}
-			catch(InterruptedException e)
-			{
+			catch(InterruptedException e){
 				e.printStackTrace();
 			}
 		}

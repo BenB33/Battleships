@@ -13,10 +13,8 @@ public class Client
 {
 	private Socket socket = null;
 	
-	public Client(String ipAddress, String port) 
-	{
-		try
-		{
+	public Client(String ipAddress, String port) {
+		try{
 			socket = new Socket(ipAddress, Integer.parseInt(port));
 			
 			DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -27,26 +25,24 @@ public class Client
 			String str = inputStream.readUTF();
 			System.out.println(str);
 		}
-		catch(IOException e)
-		{
+		catch(IOException e){
 			e.printStackTrace();
 		}
 	}
 
 	
-	public String receiveFromHost()
-	{
+	// Receives a JSON game state from the host and returns it
+	// as a string
+	//
+	public String receiveFromHost(){
 		String jsonGameState = "";
 		
-		try
-		{
+		try{
 			// Receieve data from the host via connected socket
 			DataInputStream inputStream = new DataInputStream(socket.getInputStream());
 			jsonGameState = inputStream.readUTF();
-			System.out.println(jsonGameState);
 		}
-		catch(IOException e)
-		{
+		catch(IOException e){
 			e.printStackTrace();
 		}
 		
@@ -54,36 +50,40 @@ public class Client
 	}
 	
 	
-	public void sendToHost(Board[] boards)
-	{
+	// Sends the game state containing both the enemy and player boards
+	// to the host, so the host can load that data to ensure both
+	// the host and client's game states are synced up
+	//
+	public void sendToHost(Board[] boards){
+		// Every time the host player makes a move, the host is updated
+		
+		// JSON game state
 		JSONObject jsonGameState = new JSONObject();
 		
+		// Serialize each board
 		jsonGameState.put("Host Board", boards[0].toString());
 		jsonGameState.put("Client Board", boards[1].toString());
 		
-		try
-		{
+		try{
+			// Send the game state to the host via connected socket
 			DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 			outputStream.writeUTF(jsonGameState.toString());
 			outputStream.flush();
 		}
-		catch(IOException e)
-		{
+		catch(IOException e){
 			e.printStackTrace();
 		}
 		
 	}
 	
 	
-	public void shutdown()
-	{
-		// Shutdown the connected socket
-		try
-		{
+	// Shuts down the connected socket
+	//
+	public void shutdown(){
+		try{
 			socket.close();
 		}
-		catch(IOException e)
-		{
+		catch(IOException e){
 			e.printStackTrace();
 		}
 	}

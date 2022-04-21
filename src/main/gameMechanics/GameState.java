@@ -1,8 +1,7 @@
 package main.gameMechanics;
 
-public enum GameState 
-{
-	WAITING_FOR_PLAY_DECISION, PLACING_SHIP, MAKING_MOVE, WAITING_FOR_OPPONENT, PLAYER_HAS_WON, OPPONENT_HAS_WON
+public enum GameState{
+	WAITING_FOR_PLAY_DECISION, PLACING_SHIP, MAKING_MOVE, WAITING_FOR_OPPONENT, PLAYER_HAS_WON, OPPONENT_HAS_WON, WAITING_FOR_HOST_REMATCH_DECISION
 	
 	// Waiting for play decision
 	
@@ -27,4 +26,7 @@ public enum GameState
 	
 	// Opponent has won
 	// The opponent has won the game when all of the player's ships have been sunk.
+	
+	// Waiting for host rematch decision
+	// The host will decide whether they want a rematch or not.
 }

@@ -35,8 +35,7 @@ public class MenuBar {
 
 	private static int port = 53200;
 	
-	public static void populateMenuBar(JMenuBar menuBar, JFrame frame)
-	{
+	public static void populateMenuBar(JMenuBar menuBar, JFrame frame){
 		ArrayList<String> ipAddressList = NetworkUtils.getIPv4List();
 		
 		// Create Single-Player JMenu
@@ -44,30 +43,30 @@ public class MenuBar {
 		singlePlayerMenu.setMnemonic('s');
 		menuBar.add(singlePlayerMenu);
 		
-			// Start Single-Player game item
-			JMenuItem startSinglePlayerItem = new JMenuItem("Start Game");
-			startSinglePlayerItem.setMnemonic('s');
-			singlePlayerMenu.add(startSinglePlayerItem);
+		// Start Single-Player game item
+		JMenuItem startSinglePlayerItem = new JMenuItem("Start Game");
+		startSinglePlayerItem.setMnemonic('s');
+		singlePlayerMenu.add(startSinglePlayerItem);
 			
-			// End Single-Player game item
-			JMenuItem endSinglePlayerItem = new JMenuItem("End Game");
-			startSinglePlayerItem.setMnemonic('e');
-			singlePlayerMenu.add(endSinglePlayerItem);
+		// End Single-Player game item
+		JMenuItem endSinglePlayerItem = new JMenuItem("End Game");
+		startSinglePlayerItem.setMnemonic('e');
+		singlePlayerMenu.add(endSinglePlayerItem);
 		
 		// Create Multi-Player JMenu
 		JMenu multiPlayerMenu = new JMenu("Multi-Player");
 		multiPlayerMenu.setMnemonic('m');
 		menuBar.add(multiPlayerMenu);
 		
-			// Host a multi-player game menu item
-			JMenuItem hostItem = new JMenuItem("Host");
-			hostItem.setMnemonic('h');
-			multiPlayerMenu.add(hostItem);
+		// Host a multi-player game menu item
+		JMenuItem hostItem = new JMenuItem("Host");
+		hostItem.setMnemonic('h');
+		multiPlayerMenu.add(hostItem);
 			
-			// Join a multi-player game menu item
-			JMenuItem joinItem = new JMenuItem("Join");
-			hostItem.setMnemonic('j');
-			multiPlayerMenu.add(joinItem);
+		// Join a multi-player game menu item
+		JMenuItem joinItem = new JMenuItem("Join");
+		hostItem.setMnemonic('j');
+		multiPlayerMenu.add(joinItem);
 		
 		// Exit game menu item
 		JMenuItem exitItem = new JMenuItem("Exit");
@@ -76,32 +75,26 @@ public class MenuBar {
 
 		
 		// Start a single player game
-		startSinglePlayerItem.addActionListener(new ActionListener()
-		{
+		startSinglePlayerItem.addActionListener(new ActionListener(){
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e){
 				// Single player game has been selected by the user
 				Game.game.startSingleplayerGame();
 			}
 		});
 		
 		// End a single player game
-		endSinglePlayerItem.addActionListener(new ActionListener()
-		{
+		endSinglePlayerItem.addActionListener(new ActionListener(){
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e){
 				Game.game.endSinglePlayerGame();
 			}
 		});
 		
 		// Add action listener to host menu
-		hostItem.addActionListener(new ActionListener()
-		{
+		hostItem.addActionListener(new ActionListener(){
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e){
 				// Create a dialog box for hosting options
 				JDialog hostModal = new JDialog(frame, "Host a game!", Dialog.ModalityType.DOCUMENT_MODAL);
 				
@@ -131,11 +124,9 @@ public class MenuBar {
 				
 				
 				// Add action listener to the cancel button
-				btnHost.addActionListener(new ActionListener()
-				{
+				btnHost.addActionListener(new ActionListener(){
 					@Override
-					public void actionPerformed(ActionEvent e)
-					{
+					public void actionPerformed(ActionEvent e){
 						lblLoadingSpinner.setVisible(true);
 						lblLoadingSpinner.repaint();
 
@@ -146,21 +137,16 @@ public class MenuBar {
 				});
 				
 				// Add action listener to the cancel button
-				btnCancel.addActionListener(new ActionListener()
-				{
+				btnCancel.addActionListener(new ActionListener(){
 					@Override
-					public void actionPerformed(ActionEvent e)
-					{
+					public void actionPerformed(ActionEvent e){
 						// Dispose of the join dialog window
 						hostModal.dispose();
 					}
 				});
 				
 				// Add ip address list to combo box
-				for(String address : ipAddressList)
-				{
-					comboIPAddress.addItem(address);
-				}
+				for(String address : ipAddressList) comboIPAddress.addItem(address);
 				
 				constraints.fill = GridBagConstraints.HORIZONTAL;
 				constraints.gridx = 0;
@@ -223,11 +209,9 @@ public class MenuBar {
 		});
 		
 		// Add action listener to join menu
-		joinItem.addActionListener(new ActionListener()
-		{
+		joinItem.addActionListener(new ActionListener(){
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e){
 				// Create a dialog box for joining options
 				JDialog joinDialog = new JDialog(frame, "Join a player!", Dialog.ModalityType.DOCUMENT_MODAL);
 				
@@ -276,16 +260,13 @@ public class MenuBar {
 				joinDialogPanel.add(btnCancel, constraints);
 				
 				// Add action listener to the connect button
-				btnConnect.addActionListener(new ActionListener()
-				{
+				btnConnect.addActionListener(new ActionListener(){
 					@Override
-					public void actionPerformed(ActionEvent e)
-					{
+					public void actionPerformed(ActionEvent e){
 						// Ensure that the IP and port being entered is valid, if they are valid
 						// call joinMultiplayerGame and pass the valid IP and port. Then dispose
 						// of the join pop-up modal.
-						if(NetworkUtils.ipPortValidation(txtIpAddress.getText(), txtPort.getText(), joinDialog))
-						{
+						if(NetworkUtils.ipPortValidation(txtIpAddress.getText(), txtPort.getText(), joinDialog)){
 							Game.game.joinMultiplayerGame(txtIpAddress.getText(), txtPort.getText());
 							joinDialog.dispose();
 						}
@@ -293,11 +274,9 @@ public class MenuBar {
 				});
 				
 				// Add action listener to the cancel button
-				btnCancel.addActionListener(new ActionListener()
-				{
+				btnCancel.addActionListener(new ActionListener(){
 					@Override
-					public void actionPerformed(ActionEvent e)
-					{
+					public void actionPerformed(ActionEvent e){
 						// Dispose of the join dialog window
 						joinDialog.dispose();
 					}
@@ -312,11 +291,9 @@ public class MenuBar {
 			}});
 		
 		// Add action listener to the exit menu bar option
-		exitItem.addActionListener(new ActionListener()
-		{
+		exitItem.addActionListener(new ActionListener(){
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e){
 				// Exit program
 				System.exit(0);
 			}

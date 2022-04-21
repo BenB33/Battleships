@@ -1,6 +1,5 @@
 package main.gameMechanics;
 
-public enum ShipOrientation 
-{
+public enum ShipOrientation{
 	HORIZONTAL, VERTICAL
 }

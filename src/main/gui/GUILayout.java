@@ -19,7 +19,6 @@ import java.awt.FontFormatException;
 // Other Imports
 import java.io.IOException;
 
-
 public class GUILayout extends JPanel
 {
 	private static final long serialVersionUID = -5333146759133271395L;
@@ -31,9 +30,13 @@ public class GUILayout extends JPanel
 	BoardPanel playerBoard;
 	BoardPanel enemyBoard;
 	
+	// Labels that will be interacted with
+	JLabel lblTurnIndicator = new JLabel();
+	JLabel lblEnemyShipsLeft = new JLabel();
+	
+	
 	// GUI_Panel Constructor
-	public GUILayout()
-	{
+	public GUILayout(){
 		loadFont();
 		createEnemyBoard();
 		
@@ -47,28 +50,26 @@ public class GUILayout extends JPanel
 	}
 	
 	
-	private void loadFont()
-	{
-		if(mainFont == null)
-		{
-			try
-			{
+	// Load the font into memory for use throughout
+	// the program
+	//
+	private void loadFont(){
+		if(mainFont == null){
+			try{
 				mainFont = Font.createFont(Font.TRUETYPE_FONT, 
 						this.getClass().getResource("/KGColdCoffee.ttf").openStream());
 			}
-			catch(IOException e)
-			{
-				e.printStackTrace();
-			}
-			catch(FontFormatException e)
-			{
+			catch(IOException | FontFormatException e){
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	private void createEnemyBoard()
-	{
+	
+	// Creates the enemy's board that resides in the 
+	// left side of the window
+	//
+	private void createEnemyBoard(){
 		// Create JPanel to house the enemy board, label and 
 		// padding JPanel
 		JPanel enemyPanel = new JPanel();
@@ -93,8 +94,11 @@ public class GUILayout extends JPanel
 		enemyBoardPanelPadding.add(enemyBoard, BorderLayout.CENTER);
 	}
 	
-	private JPanel createPlayerBoard()
-	{
+	
+	// Creates the local player's board that resides in the top
+	// right side of the window
+	//
+	private JPanel createPlayerBoard(){
 		// Create panel for the local player
 		JPanel playerPanel = new JPanel();
 		this.add(playerPanel, BorderLayout.EAST);
@@ -119,46 +123,45 @@ public class GUILayout extends JPanel
 		return playerPanel;
 	}
 	
-	private void createInfoPanel(JPanel playerPanel)
-	{
+	
+	// Creates the info panel section that resides in the
+	// bottom right of the window
+	//
+	private void createInfoPanel(JPanel playerPanel){
 		// Information Panel
 		JPanel infoPanel = new JPanel();
 		playerPanel.add(infoPanel, BorderLayout.SOUTH);
 		infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		infoPanel.setLayout(new GridLayout(2, 2));
 		
-		// Information Panel Buttons
-		JLabel lblInfo1 = new JLabel("Info Section 1");
-		lblInfo1.setHorizontalAlignment(JLabel.CENTER);
-		infoPanel.add(lblInfo1);
-		
-		JLabel lblInfo2 = new JLabel("Info Section 2");
-		lblInfo2.setHorizontalAlignment(JLabel.CENTER);
-		infoPanel.add(lblInfo2);
-		
-		JButton btnMultiUse = new JButton("Next");
-		btnMultiUse.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				// Multi use button action:
-				
-				
-			}
-		});
-		infoPanel.add(btnMultiUse);
-		
+		// Information Panel labels and button
+		lblTurnIndicator = new JLabel("Turn:");
+		lblTurnIndicator.setHorizontalAlignment(JLabel.CENTER);
+		lblEnemyShipsLeft = new JLabel("Ships Left:");
+		lblEnemyShipsLeft.setHorizontalAlignment(JLabel.CENTER);
 		JButton btnExit = new JButton("Exit");
-		btnExit.addActionListener(new ActionListener()
-		{
+		
+		// Exit button action listener. Exits the program
+		btnExit.addActionListener(new ActionListener(){
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e){
 				// Exit the program
 				System.exit(0);
 			}
 		});
+		
+		// Add the widgets to the info panel
+		infoPanel.add(lblTurnIndicator);
+		infoPanel.add(lblEnemyShipsLeft);
+		infoPanel.add(new JLabel(""));
 		infoPanel.add(btnExit);
+	}
+	
+	
+	// Set the info labels in the info section
+	//
+	public void setInfoLabels(String turn, int shipsLeft){
+		lblTurnIndicator.setText("Turn: " + turn);
+		lblEnemyShipsLeft.setText("Ships Left: " + shipsLeft);
 	}
 }

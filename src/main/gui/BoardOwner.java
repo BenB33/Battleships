@@ -1,6 +1,5 @@
 package main.gui;
 
-public enum BoardOwner 
-{
+public enum BoardOwner{
 	PLAYER, ENEMY;
 }
