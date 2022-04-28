@@ -96,7 +96,6 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 		identifier = identify;
 		Random rand = new Random();
 		int maxNumber = 10;
-		
 		// Assignes a random water tile image to each tile
 		for(int i = 0; i < 100; i++){
 			waterTileRandom[i] = rand.nextInt(maxNumber);
@@ -339,7 +338,8 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
 				int topLeftY = (int) topLeft.getY();
 
 				// Draw hit indicator on ship tile
-				if(ships.get(i).hasShipTileBeenHit(j)) g.drawImage(miscTiles[0], topLeftX, topLeftY, tileSize, tileSize, null);
+				if(ships.get(i).hasShipTileBeenHit(j)) g.drawImage(miscTiles[0], 
+						topLeftX, topLeftY, tileSize, tileSize, null);
 			}
 		}
 	}

@@ -68,10 +68,16 @@ public class MenuBar {
 		hostItem.setMnemonic('j');
 		multiPlayerMenu.add(joinItem);
 		
+		
+		// Options Menu
+		JMenu optionsMenu = new JMenu("Options");
+		optionsMenu.setMnemonic('o');
+		menuBar.add(optionsMenu);
+		
 		// Exit game menu item
 		JMenuItem exitItem = new JMenuItem("Exit");
 		exitItem.setMnemonic('e');
-		menuBar.add(exitItem);
+		optionsMenu.add(exitItem);
 
 		
 		// Start a single player game
@@ -299,5 +305,4 @@ public class MenuBar {
 			}
 		});
 	}
-
 }

@@ -64,6 +64,8 @@ public class Server
 		jsonGameState.put("Host Board", boards[0].toString());
 		jsonGameState.put("Client Board", boards[1].toString());
 		
+		System.out.println("JSON: " + jsonGameState);
+		
 		try{
 			// Send the game state to the client via connected socket
 			DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -95,11 +97,28 @@ public class Server
 	}
 	
 	
+	public void sendClientRematchResult(String result)
+	{
+		try {
+			DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+			outputStream.writeUTF(result);
+			outputStream.flush();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	
 	// Shuts down the socket
 	//
 	public void shutdown(){
 		try{
 			socket.close();
+			serverSocket.close();
+			serverSocket = null;
+			socket = null;
 		}
 		catch(IOException e){
 			e.printStackTrace();

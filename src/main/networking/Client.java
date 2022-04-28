@@ -77,11 +77,26 @@ public class Client
 	}
 	
 	
+	public void sendHostRematchResult(String result)
+	{
+		try {
+			DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+			outputStream.writeUTF(result);
+			outputStream.flush();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	
 	// Shuts down the connected socket
 	//
 	public void shutdown(){
 		try{
 			socket.close();
+			socket = null;
 		}
 		catch(IOException e){
 			e.printStackTrace();

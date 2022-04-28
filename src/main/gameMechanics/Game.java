@@ -135,7 +135,16 @@ public class Game implements Runnable{
 				// has won the game, the rematch modal is triggered
 				System.out.println("[State] PLAYER HAS WON THE GAME!");
 				
-				rematchModalPopup();
+				if(playerRole == NetworkRole.HOST)
+				{
+					rematchModalPopup();
+				}
+				else
+				{
+					state = GameState.WAITING_FOR_HOST_REMATCH_DECISION;
+				}
+				
+				
 				break;
 				
 			case OPPONENT_HAS_WON:
@@ -143,7 +152,15 @@ public class Game implements Runnable{
 				// has won the game, the rematch modal is triggered
 				System.out.println("[State] OPPONENT HAS WON THE GAME!");
 				
-				rematchModalPopup();
+				if(playerRole == NetworkRole.HOST)
+				{
+					rematchModalPopup();
+				}
+				else
+				{
+					state = GameState.WAITING_FOR_HOST_REMATCH_DECISION;
+				}
+				
 				break;
 				
 			case WAITING_FOR_HOST_REMATCH_DECISION:
@@ -151,6 +168,55 @@ public class Game implements Runnable{
 				// is prompted with a rematch modal, they made the decision
 				// before the client is prompted with the modal.
 				System.out.println("[State] Waiting for host rematch decision");
+
+				if(!isSinglePlayer){
+					if(playerRole == NetworkRole.CLIENT){
+						System.out.println("[LOG] Receiving rematch result from host");
+						
+						String rematchResult = client.receiveFromHost();
+						
+						if(rematchResult.equals("rematch_yes")){
+							// Host has chosen to rematch so prompt the client with the rematch modal
+							System.out.println("[LOG] Host has chosen to rematch, make your decision.");
+							rematchModalPopup();
+						}
+						else if(rematchResult.equals("rematch_no")){
+							// Host has chosen not to rematch
+							System.out.println("[LOG] Host has chosen not to rematch.");
+							client.shutdown();
+							playerBoard.resetBoard();
+							enemyBoard.resetBoard();
+							state = GameState.WAITING_FOR_PLAY_DECISION;
+						}	
+					}
+					else if(playerRole == NetworkRole.HOST){
+						System.out.println("[LOG] Receiving rematch result from client");
+						String rematchResult = server.receieveFromClient();
+						
+						if(rematchResult.equals("rematch_yes")){
+							// Initiate rematch by resetting both boards 
+							// and generating a new set of random ships.
+							playerBoard.resetBoard();
+							enemyBoard.resetBoard();
+							playerBoard.placeShipsAtRandom();
+							enemyBoard.placeShipsAtRandom();
+							
+							// Send both boards to the client
+							Board[] boards = { playerBoard, enemyBoard };
+							server.sendToClient(boards);
+							
+							state = GameState.MAKING_MOVE;
+						}
+						else if(rematchResult.equals("rematch_no")){
+							// Host has chosen not to rematch
+							server.shutdown();
+							playerBoard.resetBoard();
+							enemyBoard.resetBoard();
+							state = GameState.WAITING_FOR_PLAY_DECISION;
+						}
+					}
+				}
+				else rematchModalPopup();
 				break;
 			}
 		}
@@ -191,7 +257,7 @@ public class Game implements Runnable{
 		
 		isSinglePlayer = true;
 		state = GameState.PLACING_SHIP;
-		System.out.println("end of start singleplayer game func");
+		System.out.println("[LOG] Starting Singleplayer");
 		threadWakeUp();			
 	}
 	
@@ -207,6 +273,7 @@ public class Game implements Runnable{
 		// reset so a new game can be started
 		playerBoard.resetBoard();
 		enemyBoard.resetBoard();
+		System.out.println("[LOG] Ending Singleplayer");
 		// The thread is awaken in order to change states
 		threadWakeUp();
 	}
@@ -377,22 +444,20 @@ public class Game implements Runnable{
 			// If multiplayer, the player role is determined
 			else
 			{
-				// If the player is host, new sets of ships are generated
-				// and sent to the client for them to parse. The game state
-				// is then updated
+				// If the player is host, a confirmation message is sent
+				// to the client to let them know the host wants a rematch
 				if(playerRole == NetworkRole.HOST){					
-					playerBoard.placeShipsAtRandom();
-					enemyBoard.placeShipsAtRandom();
-					
-					Board[] boards = { playerBoard, enemyBoard };
-					server.sendToClient(boards);
-					
-					state = GameState.MAKING_MOVE;
+					server.sendClientRematchResult("rematch_yes");
+					state = GameState.WAITING_FOR_HOST_REMATCH_DECISION;
 				}
-				// If the player is client, they receieve a new set of boards from
-				// the host, deserialize them so they are loaded into memory and
-				// drawn on the board GUIs. The game state is then updated.
+				// If the player is client, they will only be prompted if the
+				// host has already confirmed they want a rematch. If the client
+				// also confirms they want a rematch, then they send a confirmation
+				// message to the host and wait for new board data to be sent.
 				else if (playerRole == NetworkRole.CLIENT){
+					
+					client.sendHostRematchResult("rematch_yes");
+					
 					String stringGameState   = client.receiveFromHost();
 					JSONObject jsonGameState = new JSONObject(stringGameState);
 					
@@ -412,25 +477,42 @@ public class Game implements Runnable{
 		}
 		// If the user chooses no to a rematch
 		else if(result == JOptionPane.NO_OPTION){
-			// No match is desired so if singleplayer, endSinglePlayer function is called
+			// If no rematch, then the singleplayer game will end
 			if(isSinglePlayer) Game.game.endSinglePlayerGame();
 			// If multiplayer, the player role is determined
 			else{
-				// End multiplayer game
-				// If the player is host, server.shutdown is called,
-				// the boards are reset and the game state is updated
+				// If no rematch, the host will send a confirmation message
+				// to the client, and then reset boards and shutdown connection
 				if(playerRole == NetworkRole.HOST){
+					server.sendClientRematchResult("rematch_no");
+					
 					server.shutdown();
 					playerBoard.resetBoard();
 					enemyBoard.resetBoard();
+					
+					server = null;
+					client = null;
+					
+					connectedIPAddress = "";
+					connectedPort = "";
+					
 					state = GameState.WAITING_FOR_PLAY_DECISION;
 				}
-				// If the player is client, client.shutdown is called,
-				// the boards are reset and the game state is updated
+				// If no rematch, the client will send a confirmation message
+				// to the host, and then reset boards and shutdown connection
 				else if (playerRole == NetworkRole.CLIENT){
+					client.sendHostRematchResult("rematch_no");
+					
 					client.shutdown();
 					playerBoard.resetBoard();
 					enemyBoard.resetBoard();
+					
+					server = null;
+					client = null;
+					
+					connectedIPAddress = "";
+					connectedPort = "";
+					
 					state = GameState.WAITING_FOR_PLAY_DECISION;
 				}
 			}
@@ -467,7 +549,7 @@ public class Game implements Runnable{
 	public List<Ship> getEnemyShipArray() { return enemyBoard.ships; }
     
 	public String getTurnIndicator(){
-    	if(state == GameState.WAITING_FOR_OPPONENT) return "Enemy's";
-    	else 										return "Your's";
+    	if(state == GameState.WAITING_FOR_OPPONENT) return "Enemies";
+    	else 										return "Yours";
     }
 }

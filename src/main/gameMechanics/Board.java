@@ -14,6 +14,9 @@ public class Board {
 	// [2 x 1] [2 x 2] [1 x 3] [1 x 4] [1 x 5]
 	final static private int[] SHIP_LENGTH_QTY = {2, 2, 1, 1, 1};
 	
+	final static private int BOARD_MIN = 0;
+	final static private int BOARD_MAX = 10;
+	
 	// Create an array list of ships
 	List<Ship> ships = null;
 	boolean[][] previousMoves = new boolean[10][10];
@@ -43,8 +46,8 @@ public class Board {
 		
 		// Initialising and setting all ship legal flags to true
 		boolean[][] legalTiles = new boolean[10][10];
-		for(int i = 0; i<10;i++){
-			for(int j = 0; j<10;j++){
+		for(int i = BOARD_MIN; i < BOARD_MAX; i++){
+			for(int j = BOARD_MIN; j < BOARD_MAX; j++){
 				legalTiles[i][j] = true;
 			}
 		}
@@ -174,9 +177,9 @@ public class Board {
 	private void printShipDebug(boolean[][] legalTiles)
 	{
 		// *Debug Code*
-		for(int q = 0; q<10;q++)
+		for(int q = BOARD_MIN; q < BOARD_MAX; q++)
 		{
-			for(int p = 0; p<10;p++)
+			for(int p = BOARD_MIN; p < BOARD_MAX; p++)
 			{
 				if(legalTiles[p][q] == true) System.out.print(" . ");
 				else System.out.print(" X ");
@@ -186,13 +189,14 @@ public class Board {
 		System.out.print("\n\n\n");
 	}
 	
+	// Replace if statement with min and max variables
 	
 	// Carrying out multiple checks to ensure the move being
 	// passed to the function is legal and can be made
 	//
 	public boolean isMoveLegal(int x, int y){
 		// If a move is outside of the board range, it is illegal
-		if(x > 9 || x < 0 || y > 9 || y < 0){
+		if(x >= BOARD_MAX || x < BOARD_MIN || y >= BOARD_MAX || y < BOARD_MIN){
 			System.out.println("Move is off the board.");
 			return false;
 		}
@@ -273,8 +277,8 @@ public class Board {
 		
 		// Setting all booleans in previousMoves
 		// to false
-		for(int i = 0; i<10; i++){
-			for(int j = 0; j<10; j++){
+		for(int i = BOARD_MIN; i < BOARD_MAX; i++){
+			for(int j = BOARD_MIN; j < BOARD_MAX; j++){
 				previousMoves[i][j] = false;
 			}
 		}
